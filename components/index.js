@@ -1,6 +1,6 @@
 import FocusedStatusBar from "./FocusedStatusBar";
-import BottomNav from "./BottomNav";
+import HorizontalScrollBar from "./HorizontalScrollBar";
 
 export {
-    FocusedStatusBar, BottomNav
+    FocusedStatusBar, HorizontalScrollBar
 }

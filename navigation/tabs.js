@@ -3,7 +3,7 @@ import { StyleSheet, View, Image, Text, TouchableOpacity, Pressable } from 'reac
 
 
 import Home from '../screens/Home'
-import Details from '../screens/Details'
+import Friends from '../screens/Friends'
 import Log from '../screens/Log'
 
 const Tab = createBottomTabNavigator();
@@ -44,6 +44,7 @@ const Tabs = () => {
             }
         }}>
             <Tab.Screen name="Home" component={Home} options={{
+                headerShown: false,
                 tabBarIcon: ({focused}) => (
                     <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>
                         {/* <Chart_Icon height={20} width={20}/> */}
@@ -65,6 +66,7 @@ const Tabs = () => {
             }}/>
             <Tab.Screen name="Log" component={Log}
                 options={{
+                    headerShown: false,
                     tabBarIcon: ({focused}) => (
                         <View style={{
                             alignItems: 'center', 
@@ -91,7 +93,8 @@ const Tabs = () => {
                     )
                 }}
             /> 
-            <Tab.Screen name="Details" component={Details} options={{
+            <Tab.Screen name="Friends" component={Friends} options={{
+                    headerShown: false,
                     tabBarIcon: ({focused}) => (
                         <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>
                         <Image 
