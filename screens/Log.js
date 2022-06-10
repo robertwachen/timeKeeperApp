@@ -14,8 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import sqlite from 'react-native-sqlite-storage';
 import * as SQLite from "expo-sqlite";
 import { get } from 'react-native/Libraries/Utilities/PixelRatio';
-
-const db = SQLite.openDatabase('db.testDb') // returns Database object
+import { clearUpdateCacheExperimentalAsync } from 'expo-updates';
 
 // import * as Sharing from 'expo-sharing';
 // import * as FileSystem from 'expo-file-system';
@@ -66,23 +65,30 @@ const db = SQLite.openDatabase('db.testDb') // returns Database object
 // })
 
 
+const db = SQLite.openDatabase('db.testDb') // returns Database object
+
 const Log = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const[logs, setLogs] = useState([]);
+  const [startDate, setStartDate] = useState(new Date());
+  const [startTime, setStartTime] = useState(new Date());
+  const [endTime, setEndTime] = useState((new Date()));
 
 
-  const startTime = new Date();
-  const endTime = new Date();
 
-  // Puts start time in 15 minute increments floored
-  startTime.setHours(startTime.getHours(),(Math.floor(startTime.getMinutes() / 15) * 15), 0)
-  endTime.setHours(15, 15, 0)
+  // const startTime = new Date();
+  // const endTime = new Date();
+
+  // // Puts start time in 15 minute increments floored
+  // startTime.setHours(startTime.getHours(),(Math.floor(startTime.getMinutes() / 15) * 15), 0)
+  // this is rly jank
+  endTime.setHours((startTime.getHours() - 4.0), 0, 0)
 
 
   const createTable = () => {
     db.transaction((tx) => {
       tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS Logs (id INTEGER PRIMARY KEY AUTOINCREMENT, Category TEXT NOT NULL, Date TEXT NOT NULL, Start Time TEXT NOT NULL, End Time TEXT NOT NULL);"
+        "CREATE TABLE IF NOT EXISTS newDB (id INTEGER PRIMARY KEY AUTOINCREMENT, Category TEXT NOT NULL, Date TEXT NOT NULL, Start_Time TEXT NOT NULL, End_Time TEXT NOT NULL);"
       ),
       [],
       (tx, rs) => console.log('successfull'), //this isn't showing up?
@@ -94,18 +100,15 @@ const Log = () => {
     try {
       db.transaction((tx) => {
         tx.executeSql(
-          "SELECT * FROM Logs",
+          "SELECT * FROM newDB",
           [],
           (tx, results) => {
-            setLogs(results);
+            setLogs(results.rows._array);
             console.log("RESULTS: ")
-            console.log(results)
+            console.log(logs)
           }
         );
       })
-      console.log("..")
-      console.log(logs)
-      console.log("^^")
     } catch (error) {
       console.log('Error', error)
     }
@@ -115,9 +118,10 @@ const Log = () => {
     try {
       db.transaction((tx) => {
         tx.executeSql(
-          "INSERT INTO Logs (Category, Date, Start Time, End Time) VALUES (?,?,?,?)",
-          ['a','b','c','d']
-          // [log.category, JSON.stringify(log.startDate), JSON.stringify(log.startTime), JSON.stringify(log.endTime)]
+          // "INSERT INTO Logs (Category) VALUES ('a');"
+          "INSERT INTO newDB (Category, Date, Start_Time, End_Time) VALUES (?,?,?,?);",
+          // ['a','b','c','d']
+          [log.category, JSON.stringify(log.startDate), JSON.stringify(log.startTime), JSON.stringify(log.endTime)]
         );
       })
     } catch (error) {
@@ -136,13 +140,30 @@ const Log = () => {
     {
       "key": logs.length,
       "category": selectedItems[0],
-      "startDate": startTime,
+      "startDate": startDate,
       "startTime": startTime,
       "endTime": endTime,
     }
     // setLogs([...logs, newLog]);
+    console.log("**************$$$$$$$$ NEWLOG")
+    console.log(newLog)
     setData(newLog)
     getData()
+  }
+
+  const setDateFromPicker = (selectedDate) => {
+    setStartDate(selectedDate);
+    console.log(selectedDate)
+  }
+
+  const setStartTimeFromPicker = (selectedDate) => {
+    setStartTime(selectedDate);
+    console.log(selectedDate)
+  }
+
+  const setEndTimeFromPicker = (selectedDate) => {
+    setEndTime(selectedDate);
+    console.log(selectedDate)
   }
 
     return (
@@ -175,6 +196,7 @@ const Log = () => {
           <View style={{ alignItems: 'center', width: '100%' }}>
             <DateTimePicker mode="date" display="default" value={startTime} 
             style={{width: 72}}
+            onChange={setDateFromPicker}
             /> 
           </View>
         </View>
@@ -186,6 +208,8 @@ const Log = () => {
           <View style={{ alignItems: 'center', width: '100%' }}>
             <DateTimePicker mode="time" display="default" value={startTime} 
             style={{width: 80}}
+            onChange={setStartTimeFromPicker}
+            minuteInterval={15}
             /> 
           </View>
           
@@ -198,6 +222,8 @@ const Log = () => {
           <View style={{ alignItems: 'center', width: '100%' }}>
             <DateTimePicker mode="time" display="default" value={endTime} 
             style={{width: 80}}
+            onChange={setEndTimeFromPicker}
+            minuteInterval={15}
             /> 
           </View>
         </View>

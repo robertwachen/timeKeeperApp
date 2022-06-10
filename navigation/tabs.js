@@ -63,6 +63,7 @@ const Tabs = () => {
                         </Text>
                     </View>
                 ),
+                onPress: () => {console.log('here!')},
             }}/>
             <Tab.Screen name="Log" component={Log}
                 options={{
