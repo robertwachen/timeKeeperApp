@@ -60,12 +60,12 @@ const HorizontalScrollBar = (props) => {
         <View style={{
             marginLeft: 16,
         }}>
-            <ScrollView
-            horizontal
+            {/* <ScrollView
+            // horizontal
             showsVerticalScrollIndicator={false}
             showsHorizontalScrollIndicator={false}
             automaticallyAdjustContentInsets={false}
-            >
+            > */}
                 <FlatList 
                 data={props.categoryData}
                 renderItem={({item, index}) => {
@@ -73,12 +73,13 @@ const HorizontalScrollBar = (props) => {
                         <Item item={item} index={index} selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems}></Item>
                     )
                 }}
-                numColumns={Math.ceil(props.categoryData.length / 2)}
+                // numColumns={Math.ceil(props.categoryData.length / 2)}
+                numColumns={2}
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
                 // horizontal
                 />
-            </ScrollView>
+            {/* </ScrollView> */}
         </View>
     );
 }
@@ -95,8 +96,8 @@ const styles = StyleSheet.create({
         color: '#0165EC',
     },
     FlatListIcon: {
-        width: 80, 
-        height: 80, 
+        width: 50, 
+        height: 50, 
         marginHorizontal: 10,
         marginRight: 16, 
         marginBottom: 4,
@@ -108,3 +109,13 @@ const styles = StyleSheet.create({
 })
 
 export default HorizontalScrollBar
+
+/*
+
+useEffect(() => {
+    navigation.addListener('focus', () => {
+      console.log('Refreshed!');
+    });
+  }, [])
+
+*/

@@ -1,10 +1,14 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { StyleSheet, View, Image, Text, TouchableOpacity, Pressable } from 'react-native'
+import { useNavigation } from '@react-navigation/native';
+import {useState} from 'react'
 
 
 import Home from '../screens/Home'
 import Friends from '../screens/Friends'
 import Log from '../screens/Log'
+import newLog from '../screens/newLog'
+import newHome from '../screens/newHome'
 
 const Tab = createBottomTabNavigator();
 
@@ -32,6 +36,11 @@ const MiddleTabButton = ({children, onPress}) => (
 );
 
 const Tabs = () => {
+    // currentscreen only done for newlog
+    const [currentScreen, setCurrentScreen] = useState("");
+
+    const navigation = useNavigation();
+
     return (
         <Tab.Navigator tabBarOptions={{
             showLabel: false,
@@ -43,7 +52,7 @@ const Tabs = () => {
                 borderTopWidth: '1px'
             }
         }}>
-            <Tab.Screen name="Home" component={Home} options={{
+            <Tab.Screen name="newHome" component={newHome} options={{
                 headerShown: false,
                 tabBarIcon: ({focused}) => (
                     <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>
@@ -62,21 +71,40 @@ const Tabs = () => {
                             STATS
                         </Text>
                     </View>
-                ),
-                onPress: () => {console.log('here!')},
-            }}/>
-            <Tab.Screen name="Log" component={Log}
+                )
+            }}
+            />
+            <Tab.Screen name="newLog" component={newLog}
                 options={{
                     headerShown: false,
                     tabBarIcon: ({focused}) => (
-                        <View style={{
+                        <TouchableOpacity 
+                        onPress={() => {
+                            if (currentScreen == "newLog")
+                            {
+                                navigation.goBack()
+                                setCurrentScreen("")
+                            } else {
+                                navigation.navigate("newLog")
+                                setCurrentScreen("newLog")
+                            }
+                        }}
+                        activeOpacity={1}
+                        >
+                        <View 
+                        style={{
                             alignItems: 'center', 
                             justifyContent: 'center',
                             width: 48,
                             height: 48,
                             borderRadius: 35,
-                            backgroundColor: '#0165EC'
-                        }}> 
+                            backgroundColor: '#0165EC',
+                        }}
+                        // onPress={() => {
+                        //     console.log('here')
+                        //     navigation.navigate('newHome')
+                        // }}
+                        > 
                             <Image
                                 source={require('../assets/icons/Plus.png')}
                                 resizeMode='contain'
@@ -84,14 +112,15 @@ const Tabs = () => {
                                     width: 15,
                                     height: 15,
                                     tintColor: '#ffffff',
+                                    transform: focused ? [{rotate: '45deg'}] : [{rotate: '0deg'}]
                                 }}
                         />
                         </View>
-                        
+                        </TouchableOpacity>
                     ),
                     tabBarButton: (props) => (
                         <MiddleTabButton {... props} />
-                    )
+                    ),
                 }}
             /> 
             <Tab.Screen name="Friends" component={Friends} options={{
