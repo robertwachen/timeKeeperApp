@@ -2,7 +2,8 @@ import { useState, Pressable } from 'react';
 import { AppRegistry, FlatList, StyleSheet, Text, View, Image } from 'react-native';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import categoryData from '../data/categoryData';
-
+import { firebase } from '../config';
+import { getDatabase, ref, set, update, onValue, push } from "firebase/database";
 
 
 
@@ -10,13 +11,43 @@ import categoryData from '../data/categoryData';
 
 const Item = (props) => {
 
+    
+
+    function addLog(userId, newLog) {
+        const db = getDatabase();
+        // const updates = {};
+        // updates['/users/1/logs'] = newLog;
+
+        // // set(ref(db, 'users/' + userId), {
+        // //   logs: [newLog],
+        // // });
+        // push(ref(db, 'users/' + userId + '/logs'), newLog);
+
+
+        const postListRef = ref(db, 'users/' + userId + '/logs');
+        const newPostRef = push(postListRef);
+        set(newPostRef, newLog);
+
+
+        
+        console.log('new log added!')
+    }
+
     // References the useState in HorizontalScrollBar
     const selectItem = (item) => {
+        const newLog = {
+            startDate: '2022-06-14T23:15:30.423Z',
+            endDate: '2022-06-14T23:16:00.423Z',
+            category: item.name,
+            subCategory: '',
+        }
         if (props.selectedItems.includes(item.name)) {
             props.setSelectedItems([]);
         } else {
             props.setSelectedItems([item.name]);
+            addLog('1',newLog)
         }
+
         // console.log(props.selectedItems[0])
         // THIS WOULD BE MULTI SELECT/DESELECT
         // if (props.selectedItems.includes(item.key)) {

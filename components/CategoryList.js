@@ -7,17 +7,58 @@ import categoryData from '../data/categoryData';
 
 
 const Item = (props) => {
+    // console.log(typeof(props.data['logs'].entries()))
 
     // References the useState in HorizontalScrollBar
     const selectItem = (item) => {
-         if (props.selectedItems.includes(item.key)) {
-            const newListItems = props.selectedItems.filter(itemKey => itemKey !== item.key);
+         if (props.selectedItems.includes(item.category)) {
+            const newListItems = props.selectedItems.filter(itemCategory => itemCategory !== item.category);
             props.setSelectedItems(newListItems);
         } else {
-            props.setSelectedItems([...props.selectedItems, item.key]);
+            props.setSelectedItems([...props.selectedItems, item.category]);
         }
     }
 
+    const totalHours = () => {
+        var result = 0;
+        for (var log in props.data['goals']) {
+            var obj = props.data['goals'][log];
+            console.log(obj)
+            if (obj["category"] == props.item.category)
+            {
+                    result = obj['hours'];
+            }
+        }
+        return result
+    }
+    const hoursSpent = () => {
+        var result = 0;
+        for (var log in props.data['logs']) {
+            var obj = props.data['logs'][log];
+            console.log(obj)
+            if (obj["category"] == props.item.category)
+            {
+                    result += 1;
+            }
+        }
+        return result
+    }
+
+    const imgPath = {
+
+        'Startup':{
+            image: require('../assets/icons/startup.png')
+        },
+        'Sleep': {
+            image: require('../assets/icons/sleep.png')
+        },
+        'Waste': {
+            image: require('../assets/icons/waste.png')
+        }
+
+    }
+      
+    
     return (
         <TouchableOpacity 
         onPress={() => selectItem(props.item)}
@@ -27,11 +68,11 @@ const Item = (props) => {
             {/* Learn how to do modal expansion, perhaps lower priority */}
             <View 
             style={[styles.CategoryListContainer, 
-            props.selectedItems.includes(props.item.key) && styles.CategoryListContainerExtended]}
+            props.selectedItems.includes(props.item.category) && styles.CategoryListContainerExtended]}
             >
                 <View style={styles.CategoryListIconContainer}>
                     <Image 
-                        source={props.item.image}
+                        source={imgPath[props.item.category]['image']}
                         style={styles.CategoryListIcon}
                     />
                 </View>
@@ -39,10 +80,10 @@ const Item = (props) => {
                 <View style={{marginLeft: 8}} />
                 <View>
                     <Text style={styles.CategoryListH1}>
-                        {props.item.name}
+                        {props.item.category}
                     </Text>
                     <Text style={styles.CategoryListH2}>
-                        X / Y hours
+                        {hoursSpent()} / {totalHours()} hours
                     </Text>
                 </View>
 
@@ -63,7 +104,6 @@ const Item = (props) => {
 }
 
 const CategoryList = (props) => {
-
     const [categoriesOpened, setCategoriesOpened] = useState([]);
 
     return (
@@ -77,10 +117,10 @@ const CategoryList = (props) => {
             automaticallyAdjustContentInsets={false}
             > */}
                 <FlatList 
-                data={categoryData}
+                data={props.data["goals"]}
                 renderItem={({item, index}) => {
                     return (
-                        <Item item={item} index={index} selectedItems={categoriesOpened} setSelectedItems={setCategoriesOpened}></Item>
+                        <Item item={item} index={index} selectedItems={categoriesOpened} setSelectedItems={setCategoriesOpened} data={props.data}></Item>
                     )
                 }}
                 />

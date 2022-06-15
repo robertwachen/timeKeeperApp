@@ -11,10 +11,11 @@ module.exports = (async () => {
     },
     resolver: {
       assetExts: assetExts.filter(ext => ext !== "svg"),
-      sourceExts: [...sourceExts, "svg"]
+      sourceExts: [...sourceExts, "svg", 'jsx', 'js', 'ts', 'tsx', 'cjs']
     }
   };
 })();
+
 
 // const { getDefaultConfig } = require('expo/metro-config');
 
@@ -23,3 +24,13 @@ module.exports = (async () => {
 // defaultConfig.resolver.assetExts.push('db');
 
 // module.exports = defaultConfig;
+
+/*
+const { getDefaultConfig } = require("@expo/metro-config");
+
+const defaultConfig = getDefaultConfig(__dirname);
+
+defaultConfig.resolver.assetExts.push("cjs");
+
+module.exports = defaultConfig;
+*/

@@ -12,6 +12,7 @@ import * as SQLite from "expo-sqlite";
 import { get } from 'react-native/Libraries/Utilities/PixelRatio';
 
 
+
 const screenWidth = Dimensions.get("window").width;
 
 // const barGraphData = {

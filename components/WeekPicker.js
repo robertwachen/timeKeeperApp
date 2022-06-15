@@ -5,7 +5,6 @@ import {useState} from 'react'
 
 // REQUIRES PROPS OF USESTATE 'SELECTEDITEMS'
 
-
 const Item = (props) => {
 
     const selectItem = (item) => {
