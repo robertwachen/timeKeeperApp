@@ -5,8 +5,8 @@ import CalendarHour from './CalendarHour';
 var lastBubbleBottomYPosition = 36;
 
 const Event = (props) => {
-    console.log('hello!!')
-    console.log(props)
+    // console.log('hello!!')
+    // console.log(props)
 
     function parseISOString(s) {
         var b = s.split(/\D+/);
@@ -14,34 +14,82 @@ const Event = (props) => {
       }
       
 
+    // ASSUMES ITS BEING GIVEN TWO TIMES ON THE SAME DAY + 15 MINUTE INCREMENTS
     const getMinutes = (d1, d2) => {
 
-        var startDate = parseISOString(d1)
-        var endDate = parseISOString(d2)
-        startDate.setSeconds(0)
-        endDate.setSeconds(0)
-        startDate.setMilliseconds(0)
-        endDate.setMilliseconds(0)
+        console.log('----')
+        // console.log(d1)
+        // console.log(d2)
 
-        // To calculate the time difference of two dates
-        console.log(startDate.getTime() + " start date time " + startDate);
-        console.log(endDate.getTime() + " end date time " + endDate);
-        console.log (endDate - startDate)
-        var Difference_In_Time = endDate.getTime() - startDate.getTime();
+        var startDateMinutes = d1.substring(d1.indexOf(':') + 1)
+        startDateMinutes = startDateMinutes.substring(0, startDateMinutes.indexOf(':'));
 
-        var Difference_In_Minutes = Difference_In_Time / (1000 * 60);
+        var startDateHours = d1.substring(d1.indexOf('T') + 1, d1.indexOf(':'))
+        
+        var endDateMinutes = d2.substring(d2.indexOf(':') + 1)
+        endDateMinutes = endDateMinutes.substring(0, endDateMinutes.indexOf(':'));
 
-        console.log(Difference_In_Time + " diff in time ");
+        var endDateHours = d2.substring(d2.indexOf('T') + 1, d2.indexOf(':'))
+
+        // console.log(startDateMinutes + '??+' + startDateHours)
+        // console.log(endDateMinutes + '+' + endDateHours)
+
+        var startMinutes = (startDateHours * 60) + (startDateMinutes * 1)
+        var endMinutes = (endDateHours * 60) + (endDateMinutes * 1)
+        // console.log(startMinutes + ' ' + endMinutes)
+
+        
+
+        // var startDate = parseISOString(d1)
+        // var endDate = parseISOString(d2)
+        // startDate.setSeconds(0)
+        // endDate.setSeconds(0)
+        // startDate.setMilliseconds(0)
+        // endDate.setMilliseconds(0)
+
+        // // To calculate the time difference of two dates
+        // console.log(startDate.getTime() + " start date time " + startDate);
+        // console.log(endDate.getTime() + " end date time " + endDate);
+        // console.log (endDate - startDate)
+        // var Difference_In_Time = endDate.getTime() - startDate.getTime();
+
+        // var Difference_In_Minutes = Difference_In_Time / (1000 * 60);
+        var Difference_In_Minutes = endMinutes - startMinutes;
+
+        // console.log(Difference_In_Time + " diff in time ");
         console.log(Difference_In_Minutes + " minutes ");
 
         return Difference_In_Minutes;
     }
 
-    // TODO
     const getColor = (category) => {
-        if (category == 'waste')
+        if (category == 'Waste')
         {
-            return '#000'
+            return '#CCC'
+        }
+        if (category == 'Prep')
+        {
+            return '#222'
+        }
+        if (category == 'School')
+        {
+            return '#444'
+        }
+        if (category == 'Eat')
+        {
+            return '#666'
+        }
+        if (category == 'Sleep')
+        {
+            return '#888'
+        }
+        if (category == 'Social')
+        {
+            return '#AAA'
+        }
+        if (category == 'Startup')
+        {
+            return '#ff00ff'
         }
         return '#000'
     }
@@ -51,35 +99,41 @@ const Event = (props) => {
     // const bubbleHeight = (getMinutes(props.item['startDate'], props.item['endDate'])) * 0.75 //this is arbitrary
     // const bubbleStartingPointY = lastBubbleBottomYPosition + 4 // arbitrary 
 
-    const bubbleColor = '#999'
-    const bubbleHeight = 100
-    const bubbleStartingPointY = lastBubbleBottomYPosition // arbitrary 
+    const bubbleColor = getColor(props.item['category'])
+    var bubbleHeight = ((getMinutes(props.item['startDate'], props.item['endDate'])) / 15 * 36) - 4
+    const bubbleStartingPointY = lastBubbleBottomYPosition
 
     lastBubbleBottomYPosition += bubbleHeight + 4;
-    console.log(bubbleStartingPointY + " " + lastBubbleBottomYPosition)
+    // console.log(bubbleStartingPointY + " " + lastBubbleBottomYPosition)
+
+    console.log(props.item)
+    console.log(bubbleColor, + ' ' + bubbleHeight + ' ' + bubbleStartingPointY)
 
     return (
         // customize backgroundColor, height, top
         <View style={[styles.calendarEventBubble, {backgroundColor: bubbleColor, height: bubbleHeight, top: bubbleStartingPointY}]}>
-            <Text style={{fontSize:14, fontWeight:"bold", color: "#fff"}}>title</Text>
+            <Text style={{fontSize:14, fontWeight:"bold", color: "#fff"}}>{props.item['category']}</Text>
         </View>
        )
 }
 
 const Calendar = (props) => {
     const [categoriesOpened, setCategoriesOpened] = useState([]);
-    console.log('********')
-    console.log(props.data['logs'])
 
-    const logData = () => {
-        var result = []
-        for (var log in props.data['logs']) {
-            var obj = props.data['logs'][log];
-            // console.log(obj)
-            result = [...result, obj]
-        }
-        return result
-    }
+    console.log(JSON.stringify(props.data) + ' *** CALENDAR DATA\n\n')
+
+    // console.log('********')
+    // console.log(props.data['logs'])
+
+    // const logData = () => {
+    //     var result = []
+    //     for (var log in props.data['logs']) {
+    //         var obj = props.data['logs'][log];
+    //         // console.log(obj)
+    //         result = [...result, obj]
+    //     }
+    //     return result
+    // }
     /*
         1. sort logs by time
         2. send the logs relevant to each calendar hour to that calendar hour
@@ -90,6 +144,22 @@ const Calendar = (props) => {
         For each log, create a display with hard coded values
     */
 
+    const getCurrentTimeHeight = () => {
+        // THIS IS IN LOCAL TIME ZONE
+
+        const todayDate = new Date()
+
+        var result = ((todayDate.getHours() * 60) + (todayDate.getMinutes())) / 15 * 36;
+        // size of the view, check to make sure thats the correct buffer
+        result += 17
+
+        // console.log(todayDate.getHours() + ': current time height')
+        // console.log(todayDate.getMinutes() + ': current time height')
+        // console.log(result + ': current time height')
+
+        return result;
+    }
+
     return (
         <View style={{
             flex: 1, flexDirection: 'column'
@@ -97,16 +167,7 @@ const Calendar = (props) => {
             {/* For nav/padding, TODO */}
             <View style={{height: 64}}>
             </View>
-            {/* <FlatList 
-                data={props.data['logs']}
-                renderItem={({item, index}) => {
-                    return (
-                        <CalendarHour item={item} index={index} />
-                    )
-                }}
-            /> */}
-
-            
+          
             
             <ScrollView>
 
@@ -119,83 +180,95 @@ const Calendar = (props) => {
                         <View style={{height: 44, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>12 AM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>1 AM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>2 AM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>3 AM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>4 AM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>5 AM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>6 AM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>7 AM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>8 AM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>9 AM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>10 AM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>11 AM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>12 PM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>1 PM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>2 PM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>3 PM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>4 PM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>5 PM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>6 PM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>7 PM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>8 PM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>9 PM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>10 PM</Text>
                         </View>
-                        <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
                             <Text>11 PM</Text>
+                        </View>
+                        <View style={{height: 144, justifyContent: 'flex-end', alignItems:'center'}}>
+                            <Text>12 AM</Text>
+                        </View>
+                        <View style={{height: 36, justifyContent: 'flex-end', alignItems:'center'}}>
                         </View>
                     </View>
 
 
                     {/* Right side components */}
                     <View style={{flex: 1}}> 
-                         {/* On-Top Components */}
+                        {/* On-Top Components */}
+                        
+                        <View style={{top: getCurrentTimeHeight(), zIndex: 3, justifyContent: 'center'}}>
+                                <View style={{backgroundColor: '#3B4043', height: 17, width: 17, left: 8, borderRadius: 20, justifyContent: 'center'}}>
+                                    <View style={{width: 115, borderBottomColor: '#3B4043', borderBottomWidth: 1, height: 1, left: 16, justifyContent: 'center'}}></View>
+                                </View>
+                        </View>
+
                         <FlatList 
-                            data={logData()}
+                            data={props.data}
                             renderItem={({item, index}) => {
                                 return (
                                     <Event item={item} index={index}></Event>
@@ -205,8 +278,177 @@ const Calendar = (props) => {
                         />
 
                         {/* Horizontal Lines + Vertical Line */}
-                        <View>
+                        <View style={{zIndex: 1, position: 'absolute', width: '100%', height: '100%'}}>
                         
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
+                        <View
+                        style={{
+                            borderBottomColor: '#CCCCCC',
+                            borderBottomWidth: 1,
+                            height: 36,
+                        }}
+                        />
                         <View
                         style={{
                             borderBottomColor: '#CCCCCC',
@@ -722,272 +964,30 @@ const Calendar = (props) => {
                     
 
                     {/* Vertical Line */}
-                    <View
-                        style={{
-                                    borderLeftColor: '#CCCCCC',
-                                    borderLeftWidth: 1,
-                                    width: 10,
-                                    height: "100%",
-                                    zIndex: 1,
-                                    position: 'absolute',
-                                    left: 16,
-                        }}
-                    />
+                        <View
+                            style={{
+                                        borderLeftColor: '#CCCCCC',
+                                        borderLeftWidth: 1,
+                                        width: 10,
+                                        height: "100%",
+                                        zIndex: 3,
+                                        position: 'absolute',
+                                        left: 16,
+                            }}
+                        />
+                        {/* <View style={{height: 17, zIndex: 2, justifyContent: 'center', backgroundColor:'#ccc'}}>
+                                <View style={{borderBottomColor: '#3B4043', borderBottomWidth: 1, height: 1, left: 16, justifyContent: 'center'}}></View>
+                                <View style={{backgroundColor: '#3B4043', height: 17, width: 17, left: 8, borderRadius: 20, justifyContent: 'center'}}></View>
+                        </View> */}
                         </View>
+
+                        
                     </View>
                     
 
                 </View>
             </ScrollView>
            
-            {/* <ScrollView>
-                    <CalendarHour hour={12} AMPM={'AM'} data={props.data['logs']}/>
-                    <CalendarHour hour={1} AMPM={'AM'} data={props.data['logs']}/>
-                    <CalendarHour hour={2} AMPM={'AM'} data={props.data['logs']}/>
-                    <CalendarHour hour={3} AMPM={'AM'} data={props.data['logs']}/>
-                    <CalendarHour hour={4} AMPM={'AM'} data={props.data['logs']}/>
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                    <CalendarHour />
-                </ScrollView> */}
-            {/* This is for left side timestamps*/}
-            {/* <View style={{width: 56}}>
-            <View style={{height: 76, justifyContent: 'flex-end', alignItems:'center'}}>
-                <Text>5 AM</Text>
-            </View>
-            <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
-                <Text>5 AM</Text>
-            </View>
-            <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
-                <Text>5 AM</Text>
-            </View>
-            <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
-                <Text>5 AM</Text>
-            </View>
-            <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
-                <Text>5 AM</Text>
-            </View>
-            <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
-                <Text>5 AM</Text>
-            </View>
-            <View style={{height: 108, justifyContent: 'flex-end', alignItems:'center'}}>
-                <Text>5 AM</Text>
-            </View>
-            </View> */}
-
-            {/* This is for gridlines and calendar */}
-            <View style={{flex: 1}}>
-
-            {/* This is for events */}
-            {/* <View style={{
-                backgroundColor: '#E63EF5',
-                width: 116,
-                height: 175,
-                zIndex: 2,
-                position: 'absolute',
-                left: 17,
-                top: 104,
-                borderRadius: 8,
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}>
-                <Text style={{fontSize:14, fontWeight:"bold", color: "#fff"}}>Prep</Text>
-            </View>
-            <View style={{
-                backgroundColor: '#3EC7F5',
-                width: 116,
-                height: 67,
-                zIndex: 2,
-                position: 'absolute',
-                left: 17,
-                top: 284,
-                borderRadius: 8,
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}>
-                <Text style={{fontSize:14, fontWeight:"bold", color: "#fff", textAlign:'center'}}>Eating with Friends</Text>
-            </View>
-            <View style={{
-                backgroundColor: '#fff',
-                width: 116,
-                height: 71,
-                zIndex: 2,
-                position: 'absolute',
-                left: 17,
-                top: 356,
-                borderRadius: 8,
-                borderColor: '#000',
-                borderWidth: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}>
-                <Text style={{fontSize:14}}>Select Category</Text>
-            </View> */}
-
-            <View style={{height: 32}}></View>
-            {/* <View>
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-                <View
-                style={{
-                    borderBottomColor: '#CCCCCC',
-                    borderBottomWidth: 1,
-                    height: 36,
-                }}
-                />
-            </View> */}
-            {/* <View
-                style={{
-                    borderLeftColor: '#CCCCCC',
-                    borderLeftWidth: 1,
-                    width: 10,
-                    height: "100%",
-                    zIndex: 1,
-                    position: 'absolute',
-                    left: 16,
-                }}
-                /> */}
-            </View>
         </View>
     );
 }
@@ -1013,17 +1013,6 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',
-        // backgroundColor: '#E63EF5',
-        // width: 116,
-        // height: 31,
-        // zIndex: 2,
-        // position: 'absolute',
-        // left: 17,
-        // top: 105,
-        // borderBottomLeftRadius: 8,
-        // borderBottomRightRadius: 8,
-        // justifyContent: 'center',
-        // alignItems: 'center',
     },
 })
 

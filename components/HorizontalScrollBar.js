@@ -11,10 +11,10 @@ import { getDatabase, ref, set, update, onValue, push } from "firebase/database"
 
 const Item = (props) => {
 
-    
+    const db = getDatabase();
 
     function addLog(userId, newLog) {
-        const db = getDatabase();
+        
         // const updates = {};
         // updates['/users/1/logs'] = newLog;
 
@@ -30,14 +30,97 @@ const Item = (props) => {
 
 
         
-        console.log('new log added!')
+        // console.log('new log added!')
+    }
+
+    function parseISOString(s) {
+        var b = s.split(/\D+/);
+        // console.log('parsing! ' + s + ' ' + b)
+        return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
+      }
+
+    const getLastDate = () => {
+        var d1, d2;
+
+        var data = {}
+        onValue(ref(db, 'users/1/'), (snapshot) => {
+            data = snapshot.val();
+        });
+
+        const logData = () => {
+            var result = []
+
+            // console.log(data['logs'])
+            for (var log in data['logs']) {
+                // console.log("\nlog" + log)
+                var obj = data['logs'][log];
+                // {
+                //     "category": data['logs'][log]['category'],
+                //     "endDate": data['logs'][log]['endDate'],
+                //     "startDate": data['logs'][log]['startDate'],
+                //     "subCategory": data['logs'][log]['subCategory'],
+                // }
+                // console.log("\nobj" + obj['category'])
+                result = [...result, obj]
+                // console.log("\nresult" + result)
+            }
+            // for (var log in props.data) {
+            //     var obj = props.data[log];
+            //     // console.log(obj)
+            //     /*
+            //         needs some serious Date() work
+            //     */
+            //     if (obj["category"] == props.item.category)
+            //     {
+            //             result = obj['hours'];
+            //     }
+            // }
+            
+            return result
+        }
+        
+
+        // console.log("*****************DASDSJA*()")
+        // console.log(logData())
+
+        var logs = logData();
+        // console.log(logs[0]['endDate'])
+        var result = logs[0]['endDate']
+        // console.log(result)
+        // console.log('----------------')
+
+        // console.log('logs!!' + logs)
+
+        logs.forEach((log) => {
+            // console.log(log['endDate'])
+            // console.log('result' + result)
+            // d1 = parseISOString(JSON.stringify(result));
+            // console.log(d1)
+            // d2 = parseISOString(JSON.stringify(log['endDate']))
+            // console.log('d1: ' + d1 + ' d2: ' + JSON.stringify(d2))
+            // console.log('log ' + log['endDate'])
+            if (log['endDate'] > result)
+            {
+                result = log['endDate'];
+                // console.log('the new latest date is ' + result)
+            }
+            // console.log('result prevailed!')
+        })
+        // console.log(d1)
+
+        // result = d1
+
+        // console.log('LAST DATE: ' + result)
+        return result;
+
+        // return "2022-06-14T23:16:00.423Z"
     }
 
     // References the useState in HorizontalScrollBar
     const selectItem = (item) => {
         const newLog = {
-            startDate: '2022-06-14T23:15:30.423Z',
-            endDate: '2022-06-14T23:16:00.423Z',
+            startDate: JSON.stringify(getLastDate()).substring(1, 25),
+            endDate: JSON.stringify(new Date()).substring(1, 25),
             category: item.name,
             subCategory: '',
         }

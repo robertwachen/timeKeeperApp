@@ -25,9 +25,9 @@ const Item = (props) => {
         endDate.setMilliseconds(0)
 
         // To calculate the time difference of two dates
-        console.log(startDate.getTime() + " start date time " + startDate);
-        console.log(endDate.getTime() + " end date time " + endDate);
-        console.log (endDate - startDate)
+        // console.log(startDate.getTime() + " start date time " + startDate);
+        // console.log(endDate.getTime() + " end date time " + endDate);
+        // console.log (endDate - startDate)
         var Difference_In_Time = endDate.getTime() - startDate.getTime();
         
         // To calculate the no. of days between two dates
@@ -46,8 +46,8 @@ const Item = (props) => {
         //             + Difference_In_Minutes + "minutes "
         //             + Difference_In_Time + " diff in time"
         //             );
-        console.log(Difference_In_Time + " diff in time ");
-        console.log(Difference_In_Minutes + " minutes ");
+        // console.log(Difference_In_Time + " diff in time ");
+        // console.log(Difference_In_Minutes + " minutes ");
 
         return Difference_In_Minutes;
     }
@@ -82,14 +82,14 @@ const Item = (props) => {
             if (obj["category"] == props.item.category)
             {
                     // result += 1;
-                    console.log(obj)
-                    console.log('getting minutes for ' + obj['startDate'] + " to " + obj['endDate'])
+                    // console.log(obj)
+                    // console.log('getting minutes for ' + obj['startDate'] + " to " + obj['endDate'])
                     result += getMinutes(obj['startDate'], obj['endDate']);
-                    console.log('new total for ' + obj['category'] + ': ' + result)
+                    // console.log('new total for ' + obj['category'] + ': ' + result)
             }
         }
         // result += 25
-        console.log(result + " before round")
+        // console.log(result + " before round")
         // result = (Math.ceil((result / 60) / 25) * 25).toFixed(2);
 
         // MAKES RESULT A STRING
@@ -98,7 +98,7 @@ const Item = (props) => {
             result = result.substring(0, result.length - 2)
         }
         // result = Math.round(result / (60 * 15)) * 15
-        console.log(result + "after round")
+        // console.log(result + "after round")
         return result
     }
 
@@ -145,12 +145,13 @@ const Item = (props) => {
                     </Text>
                 </View>
 
-                <View style={styles.CategoryListStatusContainer}>
+                {/* FUTURE FEATURE */}
+                {/* <View style={styles.CategoryListStatusContainer}>
                     <View style={styles.CategoryListStatus} />
                     <Text style={styles.CategoryListH3}>
                         Falling Behind
                     </Text>
-                </View>
+                </View> */}
             </View>
 
             {/* <View>
