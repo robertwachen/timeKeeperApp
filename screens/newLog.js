@@ -18,11 +18,15 @@ import Calendar from '../components/Calendar';
 import { firebase } from '../config';
 import { getDatabase, ref, set, update, onValue } from "firebase/database";
 
+// Convert to Flatlist and render one by one so you can do usestate styling
+const singleDate = () => {
+
+}
 
 const NewLog = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const[logs, setLogs] = useState([]);
-  const[dateViewing, setDateViewing] = useState('2022-06-16T07:48:57.020Z');
+  const[dateViewing, setDateViewing] = useState('2022-06-15T00:00:00.000Z');
 
   const db = getDatabase(firebase);
 
@@ -56,16 +60,97 @@ const NewLog = () => {
       var currentLogStartDate = parseISOString(data['logs'][log]['startDate'])
       var currentLogEndDate = parseISOString(data['logs'][log]['endDate'])
       // console.log(currentLogStartDate)
-      var currentLogStartDateLocalTime = parseISOString(currentLogStartDate.toLocaleTimeString())
+      // var currentLogStartDateLocalTime = parseISOString(currentLogStartDate.toLocaleTimeString())
       // console.log('now LOCAL time: ' + currentLogStartDate.toLocaleDateString())
 
       var currentLogStartDateLocalTime = [currentLogStartDate.toLocaleDateString()[0], currentLogStartDate.toLocaleDateString().substring(2,4), currentLogStartDate.toLocaleDateString().substring(5)]
       var currentLogEndDateLocalTime = [currentLogEndDate.toLocaleDateString()[0], currentLogEndDate.toLocaleDateString().substring(2,4), currentLogEndDate.toLocaleDateString().substring(5)]
-      // console.log('log day' + currentLogStartDateLocalTime)
+      console.log('log day' + currentLogStartDateLocalTime + ' ' + currentLogEndDateLocalTime)
+      console.log('log day specific' + currentLogStartDate + ' ' + currentLogEndDate)
+
       var selectedDayString = parseISOString(dateViewing)
+
+      // TODO: refactor to make scalable for months that are one or two digits
       var selectedDay = [selectedDayString.toLocaleDateString()[0], selectedDayString.toLocaleDateString().substring(2,4), selectedDayString.toLocaleDateString().substring(5)]
 
       // console.log('selected day' + selectedDay)
+
+      // Sends just the part of the event that occurs during that day
+      // TODO: refactor to cover months/years
+
+      // returns a string of the greater date or equal
+      // format: [DD, MM, YYYY]
+      function compareDates (d1, d2) {
+        // same year
+        if(d1[2] == d2[2])
+        {
+          // same month
+          if(d1[0] == d2[0])
+          {
+            // same day
+            if(d1[1] == d2[1])
+            {
+              return "equal"
+            }
+            
+            // same month diff days
+            return d2[1] > d1[1] ? "d2" : "d1"
+          }
+
+          // same year diff months
+          return d2[0] > d1[0] ? "d2" : "d1"
+        }
+
+        // diff years
+        return d2[2] > d1[2] ? "d2" : "d1"
+      }
+
+      if (compareDates(currentLogStartDateLocalTime, currentLogEndDateLocalTime) != 'equal')
+      {
+        // includes case for if its Day X - Day Y @ midnight
+        // implies that enddate is greater chronologically than start date but may be new month
+        if (currentLogStartDateLocalTime[1] != currentLogEndDateLocalTime[1])
+        {
+          if (currentLogEndDateLocalTime[1] > selectedDay[1])
+          {
+            // sets to end of the day
+            currentLogEndDateLocalTime[0] = currentLogStartDateLocalTime[0];
+            currentLogEndDateLocalTime[1] = currentLogStartDateLocalTime[1];
+            currentLogEndDateLocalTime[2] = currentLogStartDateLocalTime[2];
+
+            currentLogEndDate.setFullYear(currentLogStartDateLocalTime[2])
+            currentLogEndDate.setMonth(currentLogStartDateLocalTime[0])
+            currentLogEndDate.setDate(currentLogStartDateLocalTime[1])
+            currentLogEndDate.setHours(23)
+            currentLogEndDate.setMinutes(59)
+            currentLogEndDate.setSeconds(0)
+            currentLogEndDate.setMilliseconds(0)
+          }
+          else if (currentLogStartDateLocalTime[1] < selectedDay[1])
+          {
+            // sets to beginning of the day
+            currentLogStartDateLocalTime[0] = currentLogEndDateLocalTime[0];
+            currentLogStartDateLocalTime[1] = currentLogEndDateLocalTime[1];
+            currentLogStartDateLocalTime[2] = currentLogEndDateLocalTime[2];
+
+            currentLogStartDate.setFullYear(currentLogStartDateLocalTime[2])
+            currentLogStartDate.setMonth(currentLogStartDateLocalTime[0])
+            currentLogStartDate.setDate(currentLogStartDateLocalTime[1])
+            currentLogStartDate.setHours(0)
+            currentLogStartDate.setMinutes(0)
+            currentLogStartDate.setSeconds(0)
+            currentLogStartDate.setMilliseconds(0)
+          }
+          
+        }
+        // else if (currentLogStartDateLocalTime[1] != currentLogEndDateLocalTime[1])
+        // {
+        //   localDay = endDateLocalDay;
+        //   localHours = '00'
+        //   localMinutes = '00'
+        // }
+      }
+
       if (currentLogStartDateLocalTime[0] == selectedDay[0]
           && currentLogStartDateLocalTime[1] == selectedDay[1]
           && currentLogStartDateLocalTime[2] == selectedDay[2])
@@ -140,23 +225,6 @@ const NewLog = () => {
         endDateLocalYear = endDateLocalYear.substring(endDateLocalYear.indexOf('/') + 1)
         endDateLocalYear = endDateLocalYear.substring(0,4)
 
-
-        /*
-
-        */
-        // var localMinutes = currentLogStartDate.toLocaleTimeString()
-        // localMinutes = localMinutes.substring(localMinutes.indexOf(':') + 1)
-        // localMinutes = localMinutes.substring(0, localMinutes.indexOf(':'))
-        
-        // var localHours = currentLogStartDate.toLocaleTimeString()
-        // console.log('converted ' + localHours)
-        // localHours = localHours.substring(0, localHours.indexOf(':'))
-
-        // var localDay = currentLogStartDateLocalTime[0]
-        // var localMonth = currentLogStartDateLocalTime[1]
-        // var localYear = currentLogStartDateLocalTime[2]
-        // // console.log('LOCAL START' + localMinutes + ' ' + localHours + ' ' + currentLogStartDate.toLocaleTimeString())
-
         if (localHours.length == 1)
         {
           localHours = '0' + localHours;
@@ -170,17 +238,6 @@ const NewLog = () => {
           localMonth = '0' + localMonth;
         }
 
-        // var endDateLocalMinutes = currentLogEndDate.toLocaleTimeString()
-        // endDateLocalMinutes = endDateLocalMinutes.substring(endDateLocalMinutes.indexOf(':') + 1)
-        // endDateLocalMinutes = endDateLocalMinutes.substring(0, endDateLocalMinutes.indexOf(':'))
-
-        // var endDateLocalHours = currentLogEndDate.toLocaleTimeString()
-        // endDateLocalHours = endDateLocalHours.substring(0, endDateLocalHours.indexOf(':'))
-
-        // var endDateLocalDay = currentLogEndDateLocalTime[0]
-        // var endDateLocalMonth = currentLogEndDateLocalTime[1]
-        // var endDateLocalYear = currentLogEndDateLocalTime[2]
-
         if (endDateLocalHours.length == 1)
         {
           endDateLocalHours = '0' + endDateLocalHours;
@@ -193,6 +250,26 @@ const NewLog = () => {
         {
           endDateLocalMonth = '0' + endDateLocalMonth;
         }
+
+
+        // // Sends just the part of the event that occurs during that day
+        // if (localDay != endDateLocalDay)
+        // {
+        //   // includes case for if its Day X - Day Y @ midnight
+        //   if ((endDateLocalDay * 1) > (selectedDay[0] * 1))
+        //   {
+        //     endDateLocalDay = localDay;
+        //     endDateLocalHours = '23'
+        //     endDateLocalMinutes = '59'
+        //   }
+        //   else if ((localDay * 1) < (selectedDay[0] * 1))
+        //   {
+        //     localDay = endDateLocalDay;
+        //     localHours = '00'
+        //     localMinutes = '00'
+        //   }
+        // }
+        
 
         obj['startDate'] = localYear + '-' + localMonth + '-' + localDay + 'T' + localHours + ':' + localMinutes + ':00.000Z'
         obj['endDate'] = endDateLocalYear + '-' + endDateLocalMonth + '-' + endDateLocalDay + 'T' + endDateLocalHours + ':' + endDateLocalMinutes + ':00.000Z'
@@ -210,6 +287,14 @@ const NewLog = () => {
     // console.log(JSON.stringify(result) + ' *** RESULT\n\n')
 
     return result;
+  }
+
+  const isDateSelected = () => {
+    return true;
+  }
+
+  const isDateToday = () => {
+    return true;
   }
 
     return (
@@ -230,9 +315,88 @@ const NewLog = () => {
           </View>
         </View>
 
-        {/* THIS NEEDS TO CHANGE TO JUST TODAY'S DATA! */}
-        <Calendar data={getDateViewingsData()}/>
-      
+
+        <View
+        style={{flex: 1, flexDirection: 'column'}}
+        >
+          {/* Date navigation */}
+          <View style={{height: 64}}>
+                  <ScrollView 
+                  style={{flex: 1, left: 72, width: 123, 
+                  flexDirection: 'row',
+                  }}
+                  contentContainerStyle={{
+                      alignItems: 'center', justifyContent: 'center',
+                  }}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  showsVerticalScrollIndicator={false}
+                  
+                  >
+                      <View style={{width: 42, height: '100%', marginHorizontal: 4,}}>
+                          <View 
+                          style={[styles.datePickerUnSelected, isDateSelected() && styles.datePickerSelected]}
+                          >
+                              
+                              <View style={{justifyContent:'center', alignItems: 'center'}}>
+                                  <Text>Wed</Text>
+                                  <View 
+                                  style={[styles.dateCircle, isDateToday() && styles.dateCircleToday]}
+                                  >
+                                      <Text 
+                                      style={[styles.dateText, isDateToday() && styles.dateTextToday]}
+                                      >
+                                          15
+                                      </Text>
+                                  </View>
+                              </View>
+                          </View>
+                      </View>
+                      <View style={{width: 42, height: '100%', marginHorizontal: 4,}}>
+                          <View 
+                          style={[styles.datePickerUnSelected, isDateSelected() && styles.datePickerSelected]}
+                          >
+                              
+                              <View style={{justifyContent:'center', alignItems: 'center'}}>
+                                  <Text>Thu</Text>
+                                  <View 
+                                  style={[styles.dateCircle, isDateToday() && styles.dateCircleToday]}
+                                  >
+                                      <Text 
+                                      style={[styles.dateText, isDateToday() && styles.dateTextToday]}
+                                      >
+                                          16
+                                      </Text>
+                                  </View>
+                              </View>
+                          </View>
+                      </View>
+                      <View style={{width: 42, height: '100%', marginHorizontal: 4,}}>
+                          <View 
+                          style={[styles.datePickerUnSelected, isDateSelected() && styles.datePickerSelected]}
+                          >
+                              
+                              <View style={{justifyContent:'center', alignItems: 'center'}}>
+                                  <Text>Fri</Text>
+                                  <View 
+                                  style={[styles.dateCircle, isDateToday() && styles.dateCircleToday]}
+                                  >
+                                      <Text 
+                                      style={[styles.dateText, isDateToday() && styles.dateTextToday]}
+                                      >
+                                          17
+                                      </Text>
+                                  </View>
+                              </View>
+                          </View>
+                      </View>
+                  </ScrollView>
+          </View>
+
+          <Calendar data={getDateViewingsData()}/>
+        </View>
+
+        
       </SafeAreaView>
 
     )
@@ -250,6 +414,35 @@ const styles = StyleSheet.create({
     color: '#212629',
     textAlign: 'center',
     fontWeight: '600',
+  },
+  datePickerUnSelected: {
+    width: '100%', 
+    height: '100%',  
+    justifyContent:'center', 
+    alignItems: 'center'
+},
+  datePickerSelected: {
+      borderRadius: 14, 
+      borderColor: '#000', 
+      borderWidth: 1,
+  },
+  dateCircle: {
+      justifyContent:'center',
+      alignItems: 'center',
+      width: 28, 
+      height: 28, 
+      borderRadius: 28, 
+      borderColor: '#000'
+  },
+  dateCircleToday: {
+      backgroundColor:'#000',
+  },
+  dateText: {
+      fontSize: 16, 
+      color: '#000'
+  },
+  dateTextToday: {
+      color: '#fff'
   }
 })  
 

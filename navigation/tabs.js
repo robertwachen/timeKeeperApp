@@ -37,8 +37,7 @@ const MiddleTabButton = ({children, onPress}) => (
 
 const Tabs = () => {
     // currentscreen only done for newlog
-    const [currentScreen, setCurrentScreen] = useState("");
-
+    const [currentScreen, setCurrentScreen] = useState("newHome");
     const navigation = useNavigation();
 
     return (
@@ -55,7 +54,14 @@ const Tabs = () => {
             <Tab.Screen name="newHome" component={newHome} options={{
                 headerShown: false,
                 tabBarIcon: ({focused}) => (
-                    <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>
+                    <TouchableOpacity
+                        onPress={() => {
+                            setCurrentScreen("newHome")
+                            console.log(currentScreen)
+                        }}
+                        activeOpacity={1}
+                    >
+                        <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>
                         {/* <Chart_Icon height={20} width={20}/> */}
                         <Image 
                             source={require('../assets/icons/Chart.png')}
@@ -71,6 +77,7 @@ const Tabs = () => {
                             STATS
                         </Text>
                     </View>
+                    </TouchableOpacity>
                 )
             }}
             />
@@ -83,11 +90,11 @@ const Tabs = () => {
                             if (currentScreen == "newLog")
                             {
                                 navigation.goBack()
-                                setCurrentScreen("")
                             } else {
                                 navigation.navigate("newLog")
                                 setCurrentScreen("newLog")
                             }
+                            console.log(currentScreen)
                         }}
                         activeOpacity={1}
                         >
@@ -123,24 +130,33 @@ const Tabs = () => {
                     ),
                 }}
             /> 
-            <Tab.Screen name="Friends" component={Friends} options={{
+            <Tab.Screen name="friends" component={Friends} options={{
                     headerShown: false,
                     tabBarIcon: ({focused}) => (
-                        <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>
-                        <Image 
-                            source={require('../assets/icons/People.png')}
-                            resizeMode='contain'
-                            style={{
-                                width: 20,
-                                height: 20,
-                                tintColor: focused ? '#212629' : '#AAAAAA',
-                                margin: 5,
-                            }}
-                        />
-                        <Text style={{color: focused ? '#212629' : '#AAAAAA', fontSize:10, fontWeight:'600'}}>
-                            FRIENDS
-                        </Text>
-                    </View>
+                        <TouchableOpacity
+                        onPress={() => {
+                            navigation.navigate("friends")
+                            setCurrentScreen("friends")
+                            console.log(currentScreen)
+                        }}
+                        >
+                            <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>
+                                <Image 
+                                    source={require('../assets/icons/People.png')}
+                                    resizeMode='contain'
+                                    style={{
+                                        width: 20,
+                                        height: 20,
+                                        tintColor: focused ? '#212629' : '#AAAAAA',
+                                        margin: 5,
+                                    }}
+                                />
+                                <Text style={{color: focused ? '#212629' : '#AAAAAA', fontSize:10, fontWeight:'600'}}>
+                                    FRIENDS
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
+                        
                     ),
                 }}/>
         </Tab.Navigator>

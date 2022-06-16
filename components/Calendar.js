@@ -164,12 +164,12 @@ const Calendar = (props) => {
         <View style={{
             flex: 1, flexDirection: 'column'
         }}>
-            {/* For nav/padding, TODO */}
-            <View style={{height: 64}}>
-            </View>
-          
             
-            <ScrollView>
+          
+            <ScrollView
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            >
 
                 {/* Background Times & Bars */}
                 <View style={{flexDirection: 'row',
