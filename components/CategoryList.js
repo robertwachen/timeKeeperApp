@@ -9,6 +9,49 @@ import categoryData from '../data/categoryData';
 const Item = (props) => {
     // console.log(typeof(props.data['logs'].entries()))
 
+    function parseISOString(s) {
+        var b = s.split(/\D+/);
+        return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
+      }
+      
+
+    const getMinutes = (d1, d2) => {
+
+        var startDate = parseISOString(d1)
+        var endDate = parseISOString(d2)
+        startDate.setSeconds(0)
+        endDate.setSeconds(0)
+        startDate.setMilliseconds(0)
+        endDate.setMilliseconds(0)
+
+        // To calculate the time difference of two dates
+        console.log(startDate.getTime() + " start date time " + startDate);
+        console.log(endDate.getTime() + " end date time " + endDate);
+        console.log (endDate - startDate)
+        var Difference_In_Time = endDate.getTime() - startDate.getTime();
+        
+        // To calculate the no. of days between two dates
+        var Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
+
+        var Difference_In_Hours = Difference_In_Time / (1000 * 3600);
+
+        var Difference_In_Minutes = Difference_In_Time / (1000 * 60);
+        
+        //To display the final no. of days (result)
+        // console.log("Total number of time between dates  <br>"
+        //             + startDate + "<br> and <br>" 
+        //             + endDate + " is: <br> " 
+        //             + Difference_In_Days + "days "
+        //             + Difference_In_Hours + "hours "
+        //             + Difference_In_Minutes + "minutes "
+        //             + Difference_In_Time + " diff in time"
+        //             );
+        console.log(Difference_In_Time + " diff in time ");
+        console.log(Difference_In_Minutes + " minutes ");
+
+        return Difference_In_Minutes;
+    }
+
     // References the useState in HorizontalScrollBar
     const selectItem = (item) => {
          if (props.selectedItems.includes(item.category)) {
@@ -23,7 +66,7 @@ const Item = (props) => {
         var result = 0;
         for (var log in props.data['goals']) {
             var obj = props.data['goals'][log];
-            console.log(obj)
+            // console.log(obj)
             if (obj["category"] == props.item.category)
             {
                     result = obj['hours'];
@@ -35,12 +78,27 @@ const Item = (props) => {
         var result = 0;
         for (var log in props.data['logs']) {
             var obj = props.data['logs'][log];
-            console.log(obj)
+            // console.log(obj)
             if (obj["category"] == props.item.category)
             {
-                    result += 1;
+                    // result += 1;
+                    console.log(obj)
+                    console.log('getting minutes for ' + obj['startDate'] + " to " + obj['endDate'])
+                    result += getMinutes(obj['startDate'], obj['endDate']);
+                    console.log('new total for ' + obj['category'] + ': ' + result)
             }
         }
+        // result += 25
+        console.log(result + " before round")
+        // result = (Math.ceil((result / 60) / 25) * 25).toFixed(2);
+
+        // MAKES RESULT A STRING
+        result = (Math.round((result / 60) * 4) / 4).toFixed(1)
+        if (result % 1 == 0) {
+            result = result.substring(0, result.length - 2)
+        }
+        // result = Math.round(result / (60 * 15)) * 15
+        console.log(result + "after round")
         return result
     }
 
