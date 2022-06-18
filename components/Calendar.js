@@ -1,8 +1,169 @@
-import { useState, Pressable } from 'react';
+import { useState, useEffect, Pressable } from 'react';
 import { AppRegistry, FlatList, StyleSheet, Text, View, Image, ScrollView} from 'react-native';
+import { Dimensions } from 'react-native-web';
 import CalendarHour from './CalendarHour';
 
 var lastBubbleBottomYPosition = 36;
+
+// const Event = (props) => {
+//     // console.log('hello!!')
+//     // console.log(props)
+
+//     function parseISOString(s) {
+//         var b = s.split(/\D+/);
+//         return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
+//       }
+      
+
+//     // ASSUMES ITS BEING GIVEN TWO TIMES ON THE SAME DAY + 15 MINUTE INCREMENTS
+//     const getMinutes = (d1, d2) => {
+
+//         console.log('----')
+//         // console.log(d1)
+//         // console.log(d2)
+
+//         var startDateMinutes = d1.substring(d1.indexOf(':') + 1)
+//         startDateMinutes = startDateMinutes.substring(0, startDateMinutes.indexOf(':'));
+
+//         var startDateHours = d1.substring(d1.indexOf('T') + 1, d1.indexOf(':'))
+        
+//         var endDateMinutes = d2.substring(d2.indexOf(':') + 1)
+//         endDateMinutes = endDateMinutes.substring(0, endDateMinutes.indexOf(':'));
+
+//         var endDateHours = d2.substring(d2.indexOf('T') + 1, d2.indexOf(':'))
+
+//         // console.log(startDateMinutes + '??+' + startDateHours)
+//         // console.log(endDateMinutes + '+' + endDateHours)
+
+//         var startMinutes = (startDateHours * 60) + (startDateMinutes * 1)
+//         var endMinutes = (endDateHours * 60) + (endDateMinutes * 1)
+//         // console.log(startMinutes + ' ' + endMinutes)
+
+        
+
+//         // var startDate = parseISOString(d1)
+//         // var endDate = parseISOString(d2)
+//         // startDate.setSeconds(0)
+//         // endDate.setSeconds(0)
+//         // startDate.setMilliseconds(0)
+//         // endDate.setMilliseconds(0)
+
+//         // // To calculate the time difference of two dates
+//         // console.log(startDate.getTime() + " start date time " + startDate);
+//         // console.log(endDate.getTime() + " end date time " + endDate);
+//         // console.log (endDate - startDate)
+//         // var Difference_In_Time = endDate.getTime() - startDate.getTime();
+
+//         // var Difference_In_Minutes = Difference_In_Time / (1000 * 60);
+//         var Difference_In_Minutes = endMinutes - startMinutes;
+
+//         // console.log(Difference_In_Time + " diff in time ");
+//         console.log(Difference_In_Minutes + " minutes ");
+
+//         return Difference_In_Minutes;
+//     }
+
+//     const getColor = (category) => {
+//         if (category == 'Waste')
+//         {
+//             return '#CCC'
+//         }
+//         if (category == 'Prep')
+//         {
+//             return '#222'
+//         }
+//         if (category == 'School')
+//         {
+//             return '#444'
+//         }
+//         if (category == 'Eat')
+//         {
+//             return '#666'
+//         }
+//         if (category == 'Sleep')
+//         {
+//             return '#888'
+//         }
+//         if (category == 'Social')
+//         {
+//             return '#AAA'
+//         }
+//         if (category == 'Startup')
+//         {
+//             return '#ff00ff'
+//         }
+//         return '#000'
+//     }
+
+
+//     // const bubbleColor = getColor(props.item['category'])
+//     // const bubbleHeight = (getMinutes(props.item['startDate'], props.item['endDate'])) * 0.75 //this is arbitrary
+//     // const bubbleStartingPointY = lastBubbleBottomYPosition + 4 // arbitrary 
+
+//     const bubbleColor = getColor(props.item['category'])
+//     var bubbleHeight = ((getMinutes(props.item['startDate'], props.item['endDate'])) / 15 * 36) - 4
+//     const bubbleStartingPointY = lastBubbleBottomYPosition
+
+//     lastBubbleBottomYPosition += bubbleHeight + 4;
+//     // console.log(bubbleStartingPointY + " " + lastBubbleBottomYPosition)
+
+//     console.log(props.item)
+//     console.log(bubbleColor, + ' ' + bubbleHeight + ' ' + bubbleStartingPointY)
+
+//     return (
+//         // customize backgroundColor, height, top
+//         <View style={[styles.calendarEventBubble, {backgroundColor: bubbleColor, height: bubbleHeight, top: bubbleStartingPointY}]}>
+//             <Text style={{fontSize:14, fontWeight:"bold", color: "#fff"}}>{props.item['category']}</Text>
+//         </View>
+//        )
+// }
+
+const getMinutes = (d1, d2) => {
+
+    console.log('----')
+    // console.log(d1)
+    // console.log(d2)
+
+    var startDateMinutes = d1.substring(d1.indexOf(':') + 1)
+    startDateMinutes = startDateMinutes.substring(0, startDateMinutes.indexOf(':'));
+
+    var startDateHours = d1.substring(d1.indexOf('T') + 1, d1.indexOf(':'))
+    
+    var endDateMinutes = d2.substring(d2.indexOf(':') + 1)
+    endDateMinutes = endDateMinutes.substring(0, endDateMinutes.indexOf(':'));
+
+    var endDateHours = d2.substring(d2.indexOf('T') + 1, d2.indexOf(':'))
+
+    // console.log(startDateMinutes + '??+' + startDateHours)
+    // console.log(endDateMinutes + '+' + endDateHours)
+
+    var startMinutes = (startDateHours * 60) + (startDateMinutes * 1)
+    var endMinutes = (endDateHours * 60) + (endDateMinutes * 1)
+    // console.log(startMinutes + ' ' + endMinutes)
+
+    
+
+    // var startDate = parseISOString(d1)
+    // var endDate = parseISOString(d2)
+    // startDate.setSeconds(0)
+    // endDate.setSeconds(0)
+    // startDate.setMilliseconds(0)
+    // endDate.setMilliseconds(0)
+
+    // // To calculate the time difference of two dates
+    // console.log(startDate.getTime() + " start date time " + startDate);
+    // console.log(endDate.getTime() + " end date time " + endDate);
+    // console.log (endDate - startDate)
+    // var Difference_In_Time = endDate.getTime() - startDate.getTime();
+
+    // var Difference_In_Minutes = Difference_In_Time / (1000 * 60);
+    var Difference_In_Minutes = endMinutes - startMinutes;
+
+    // console.log(Difference_In_Time + " diff in time ");
+    console.log(Difference_In_Minutes + " minutes ");
+
+    return Difference_In_Minutes;
+}
 
 const Event = (props) => {
     // console.log('hello!!')
@@ -15,52 +176,7 @@ const Event = (props) => {
       
 
     // ASSUMES ITS BEING GIVEN TWO TIMES ON THE SAME DAY + 15 MINUTE INCREMENTS
-    const getMinutes = (d1, d2) => {
-
-        console.log('----')
-        // console.log(d1)
-        // console.log(d2)
-
-        var startDateMinutes = d1.substring(d1.indexOf(':') + 1)
-        startDateMinutes = startDateMinutes.substring(0, startDateMinutes.indexOf(':'));
-
-        var startDateHours = d1.substring(d1.indexOf('T') + 1, d1.indexOf(':'))
-        
-        var endDateMinutes = d2.substring(d2.indexOf(':') + 1)
-        endDateMinutes = endDateMinutes.substring(0, endDateMinutes.indexOf(':'));
-
-        var endDateHours = d2.substring(d2.indexOf('T') + 1, d2.indexOf(':'))
-
-        // console.log(startDateMinutes + '??+' + startDateHours)
-        // console.log(endDateMinutes + '+' + endDateHours)
-
-        var startMinutes = (startDateHours * 60) + (startDateMinutes * 1)
-        var endMinutes = (endDateHours * 60) + (endDateMinutes * 1)
-        // console.log(startMinutes + ' ' + endMinutes)
-
-        
-
-        // var startDate = parseISOString(d1)
-        // var endDate = parseISOString(d2)
-        // startDate.setSeconds(0)
-        // endDate.setSeconds(0)
-        // startDate.setMilliseconds(0)
-        // endDate.setMilliseconds(0)
-
-        // // To calculate the time difference of two dates
-        // console.log(startDate.getTime() + " start date time " + startDate);
-        // console.log(endDate.getTime() + " end date time " + endDate);
-        // console.log (endDate - startDate)
-        // var Difference_In_Time = endDate.getTime() - startDate.getTime();
-
-        // var Difference_In_Minutes = Difference_In_Time / (1000 * 60);
-        var Difference_In_Minutes = endMinutes - startMinutes;
-
-        // console.log(Difference_In_Time + " diff in time ");
-        console.log(Difference_In_Minutes + " minutes ");
-
-        return Difference_In_Minutes;
-    }
+    
 
     const getColor = (category) => {
         if (category == 'Waste')
@@ -101,25 +217,44 @@ const Event = (props) => {
 
     const bubbleColor = getColor(props.item['category'])
     var bubbleHeight = ((getMinutes(props.item['startDate'], props.item['endDate'])) / 15 * 36) - 4
-    const bubbleStartingPointY = lastBubbleBottomYPosition
 
-    lastBubbleBottomYPosition += bubbleHeight + 4;
+    // useEffect(() => {
+    //     props.setLastBubbleBottomYPosition(bubbleStartingPointY + bubbleHeight + 4)
+    //   }, []);
+    
+
+    // setLastBubbleBottomYPosition(bubbleStartingPointY + bubbleHeight + 4)
+    // lastBubbleBottomYPosition += bubbleHeight + 4;
     // console.log(bubbleStartingPointY + " " + lastBubbleBottomYPosition)
 
+    // useEffect(() => {
+    //     // console.log(props.lastBubbleBottomYPosition)
+    //     // console.log(bubbleStartingPointY)
+    //     // console.log(bubbleHeight)
+    //     const setNewStartingPosition = () => {
+    //         props.setLastBubbleBottomYPosition(bubbleStartingPointY + bubbleHeight + 4)
+    //     }
+    //     setNewStartingPosition();
+    //     // console.log('done! :) new pos:')
+    //     // console.log(props.lastBubbleBottomYPosition)
+    //     // console.log('---')
+    //   }, []);
+    
     console.log(props.item)
-    console.log(bubbleColor, + ' ' + bubbleHeight + ' ' + bubbleStartingPointY)
+    console.log(bubbleColor, + ' ' + bubbleHeight)
 
     return (
         // customize backgroundColor, height, top
-        <View style={[styles.calendarEventBubble, {backgroundColor: bubbleColor, height: bubbleHeight, top: bubbleStartingPointY}]}>
+        <View style={[styles.calendarEventBubble, {backgroundColor: bubbleColor, height: bubbleHeight, 
+            // top: bubbleStartingPointY
+        }]}>
             <Text style={{fontSize:14, fontWeight:"bold", color: "#fff"}}>{props.item['category']}</Text>
         </View>
        )
 }
 
 const Calendar = (props) => {
-    const [categoriesOpened, setCategoriesOpened] = useState([]);
-
+    console.log(JSON.stringify(props) + ' *** PROPS!\n\n')
     console.log(JSON.stringify(props.data) + ' *** CALENDAR DATA\n\n')
 
     // console.log('********')
@@ -160,6 +295,56 @@ const Calendar = (props) => {
         return result;
     }
 
+    // const getUnfilledTimeTop = () => {
+    //     // setTimeout(() => {
+    //     //     return lastBubbleBottomYPosition;;
+    //     //   }, 1000);
+    //     return lastBubbleBottomYPosition;
+    // }
+
+    const getUnfilledTimeHeight = () => {
+        var totalBubbleHeight = 0
+        for (let event of props.data)
+        {
+            totalBubbleHeight += ((getMinutes(event['startDate'], event['endDate'])) / 15 * 36)
+        }
+        if (totalBubbleHeight != 0) {
+            return getCurrentTimeHeight() - totalBubbleHeight;
+        }
+        else {
+            return "98.55%"
+        }
+        
+    }
+
+    const showCurrentTimeIndicator = () => {
+
+        const dateViewingArr = [JSON.stringify(props.dateViewing).substring(6, 8), JSON.stringify(props.dateViewing).substring(9, 11), JSON.stringify(props.dateViewing).substring(1, 5)]
+        const todaysDateArr = [new Date().toLocaleDateString(), '', '']
+        todaysDateArr[1] = todaysDateArr[0].substring(todaysDateArr[0].indexOf('/') + 1)
+        todaysDateArr[2] = todaysDateArr[1].substring(todaysDateArr[1].indexOf('/') + 1)
+        todaysDateArr[1] = todaysDateArr[1].substring(0, todaysDateArr[1].indexOf('/'))
+        todaysDateArr[0] = todaysDateArr[0].substring(0, todaysDateArr[0].indexOf('/'))
+
+        if (((dateViewingArr[0] * 1) == (todaysDateArr[0] * 1)) &&
+            ((dateViewingArr[1] * 1) == (todaysDateArr[1] * 1)) &&
+            ((dateViewingArr[2] * 1) == (todaysDateArr[2] * 1))
+           )
+        {
+            return true
+        }
+
+        // console.log(dateViewingArr)
+        // console.log(todaysDateArr)
+        return false
+    }
+
+    // console.log('asdasad')
+    // console.log(JSON.stringify(props.dateViewing))
+    // console.log(new Date(props.dateViewing))
+    // console.log(new Date().toLocaleDateString())
+    console.log(showCurrentTimeIndicator())
+
     return (
         <View style={{
             flex: 1, flexDirection: 'column'
@@ -169,6 +354,7 @@ const Calendar = (props) => {
             <ScrollView
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
+            contentOffset={{x: 0, y: getCurrentTimeHeight() - 500}}
             >
 
                 {/* Background Times & Bars */}
@@ -260,23 +446,46 @@ const Calendar = (props) => {
                     {/* Right side components */}
                     <View style={{flex: 1}}> 
                         {/* On-Top Components */}
+
                         
-                        <View style={{top: getCurrentTimeHeight(), zIndex: 3, justifyContent: 'center'}}>
-                                <View style={{backgroundColor: '#3B4043', height: 17, width: 17, left: 8, borderRadius: 20, justifyContent: 'center'}}>
-                                    <View style={{width: 115, borderBottomColor: '#3B4043', borderBottomWidth: 1, height: 1, left: 16, justifyContent: 'center'}}></View>
-                                </View>
+
+                        {props.data.map (
+                            (item, index) => {
+                                return (
+                                    <Event item={item} key={index}></Event>
+                                )
+                            }
+                        )}
+
+                        <View style={[styles.calendarAddEventBubble, {height: getUnfilledTimeHeight()}]}>
+                                <Text style={{fontSize:12, fontWeight:"bold", color: "#3B4043"}}>
+                                    Select Category
+                                </Text>
                         </View>
 
-                        <FlatList 
+                        {/* <FlatList 
                             data={props.data}
                             renderItem={({item, index}) => {
                                 return (
-                                    <Event item={item} index={index}></Event>
+                                    <Event item={item} index={index} lastBubbleBottomYPosition={lastBubbleBottomYPosition} setLastBubbleBottomYPosition={setLastBubbleBottomYPosition}></Event>
                                 )
                             }}
                             style={{zIndex: 2, position: 'absolute', width: '100%', height: '100%'}}
-                        />
+                        ></FlatList> */}
 
+                        {/* ALT COLOR: #e43e37
+                        getCurrentTimeHeight()
+                         */}
+                         {
+                            showCurrentTimeIndicator() ?
+                            <View style={{zIndex: 3, justifyContent: 'center'}}>
+                                <View style={{backgroundColor: '#3B4043', height: 17, width: 17, left: 8, borderRadius: 20, justifyContent: 'center'}}>
+                                    <View style={{width: 115, borderBottomColor: '#3B4043', borderBottomWidth: 1, height: 1, left: 16, justifyContent: 'center'}}></View>
+                                </View>
+                            </View>
+                            :
+                            null
+                         }
                         {/* Horizontal Lines + Vertical Line */}
                         <View style={{zIndex: 1, position: 'absolute', width: '100%', height: '100%'}}>
                         
@@ -1008,9 +1217,22 @@ const styles = StyleSheet.create({
     calendarEventBubble: {
         width: 116,
         zIndex: 2,
-        position: 'absolute',
+        // position: 'absolute',
         left: 17,
         borderRadius: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    calendarAddEventBubble: {
+        width: 116,
+        zIndex: 3,
+        // position: 'absolute',
+        left: 17,
+        borderRadius: 8,
+        borderColor: '#3B4043',
+        borderWidth: 2,
+        backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
     },

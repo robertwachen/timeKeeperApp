@@ -19,14 +19,120 @@ import { firebase } from '../config';
 import { getDatabase, ref, set, update, onValue } from "firebase/database";
 
 // Convert to Flatlist and render one by one so you can do usestate styling
-const singleDate = () => {
+const SingleDate = (props) => {
 
+  const todaysDateArr = [new Date().toLocaleDateString(), '', '']
+        todaysDateArr[1] = todaysDateArr[0].substring(todaysDateArr[0].indexOf('/') + 1)
+        todaysDateArr[2] = todaysDateArr[1].substring(todaysDateArr[1].indexOf('/') + 1)
+        todaysDateArr[1] = todaysDateArr[1].substring(0, todaysDateArr[1].indexOf('/'))
+        todaysDateArr[0] = todaysDateArr[0].substring(0, todaysDateArr[0].indexOf('/'))
+  const itemDate = [props.item.substring(0, props.item.indexOf('/')), '', '']
+  itemDate[1] = [props.item.substring((props.item.indexOf('/') + 1), props.item.indexOf(',') - 5)]
+  itemDate[2] = [props.item.substring((props.item.indexOf(',') - 4), props.item.indexOf(','))]
+  const selectedDate = [new Date(props.dateViewing).toISOString().substring(5, 7), new Date(props.dateViewing).toISOString().substring(8, 10), new Date(props.dateViewing).toISOString().substring(0, 4)]
+  console.log(props)
+  console.log("____________++++______________")
+
+  const isDateToday = () => {
+    // console.log(todayDate[0] * 1, todayDate[1] * 1, todayDate[2] * 1)
+    // console.log(itemDate[0] * 1, itemDate[1] * 1, itemDate[2] * 1)
+    if ((todaysDateArr[0] * 1) == (itemDate[0] * 1) &&
+      (todaysDateArr[1] * 1) == (itemDate[1] * 1) &&
+      (todaysDateArr[2] * 1) == (itemDate[2] * 1))
+    {
+      // console.log(true)
+      return true
+    }
+    // console.log(false)
+    return false;
+  }
+
+  const getDayText = () => {
+    // local time
+    const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    // console.log(new Date(props.dateViewing).getDay())
+    // console.log(new Date(props.dateViewing).getDate())
+    // console.log(props.item)
+    return [weekDays[new Date(props.item).getDay()].substring(0, 3), new Date(props.item).getDate()]
+  }
+
+  const isDateSelected = () => {
+    // const itemDate = [new Date(props.item.date).getDate(), new Date(props.item.date).getMonth(), new Date(props.item.date).getFullYear()]
+
+    if ((itemDate[0] * 1) == (selectedDate[0] * 1) &&
+      (itemDate[1] * 1) == (selectedDate[1] * 1) &&
+      (itemDate[2] * 1) == (selectedDate[2] * 1))
+    {
+      return true
+    }
+    return false;
+  }
+
+  const setSelectedDate = () => {
+    var result = new Date()
+    // console.log(result.toISOString() + '//')
+
+    console.log(result.toISOString())
+    console.log(result.toLocaleDateString())
+    console.log(itemDate)
+    console.log("SADNJAODNOASNDISANOIDSANIO")
+
+    result.setUTCMonth((itemDate[0] * 1) - 1)
+    result.setUTCDate((itemDate[1] * 1))
+    result.setUTCFullYear(itemDate[2])
+    console.log(result.toISOString())
+
+    // console.log(result.toISOString() + '++')
+
+    // result.setUTCMonth((itemDate[0] * 1) - 1)
+    // result.setUTCDate((itemDate[1] * 1) - 1)
+    // result.setUTCFullYear(itemDate[2])
+    // console.log(result.toISOString() + '**')
+    props.setDateViewing(result)
+  }
+  // console.log('\n\n '+ itemDate + '\n\n ')
+
+  return (
+            // <View style={[styles.calendarEventBubble, {backgroundColor: bubbleColor, height: bubbleHeight, top: bubbleStartingPointY}]}>
+            //     <Text style={{fontSize:14, fontWeight:"bold", color: "#fff"}}>{props.item['category']}</Text>
+            // </View>
+            <TouchableOpacity
+            onPress={() => setSelectedDate()}
+            activeOpacity={1}
+            >
+              <View 
+            style={{width: 42, height: '100%', marginHorizontal: 4,}}
+            >
+              <View 
+                style={[styles.datePickerUnSelected, isDateSelected() && styles.datePickerSelected]}
+                >
+                    
+                    <View style={{justifyContent:'center', alignItems: 'center'}}>
+                        <Text>
+                          {getDayText()[0]}
+                        </Text>
+                        <View 
+                        style={[styles.dateCircle, isDateToday() && styles.dateCircleToday]}
+                        >
+                            <Text 
+                            style={[styles.dateText, isDateToday() && styles.dateTextToday]}
+                            >
+                                {getDayText()[1]}
+                            </Text>
+                        </View>
+                    </View>
+              </View>
+            </View>
+            </TouchableOpacity>
+            
+  )
 }
 
 const NewLog = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const[logs, setLogs] = useState([]);
-  const[dateViewing, setDateViewing] = useState('2022-06-15T00:00:00.000Z');
+  const[dateViewing, setDateViewing] = useState(new Date());
+  // console.log(dateViewing)
 
   const db = getDatabase(firebase);
 
@@ -35,8 +141,9 @@ const NewLog = () => {
     onValue(ref(db, 'users/1/'), (snapshot) => {
     data = snapshot.val();
     });
+    console.log("FROM NEWLOG.JS:")
     console.log(data)
-    console.log("FROM NEWLOG.JS")
+    console.log('=========================================================')
     return data
   }
 
@@ -68,12 +175,19 @@ const NewLog = () => {
       console.log('log day' + currentLogStartDateLocalTime + ' ' + currentLogEndDateLocalTime)
       console.log('log day specific' + currentLogStartDate + ' ' + currentLogEndDate)
 
-      var selectedDayString = parseISOString(dateViewing)
+      console.log('dv ' + dateViewing)
+      // var selectedDayString = parseISOString(dateViewing)
+      // console.log('dv2 ' + selectedDayString)
+      // console.log('=============== ' + dateViewing + ' ==================')
 
       // TODO: refactor to make scalable for months that are one or two digits
-      var selectedDay = [selectedDayString.toLocaleDateString()[0], selectedDayString.toLocaleDateString().substring(2,4), selectedDayString.toLocaleDateString().substring(5)]
+      // var selectedDay = [dateViewing.toLocaleDateString()[0], dateViewing.toLocaleDateString().substring(2,4), dateViewing.toLocaleDateString().substring(5)]
+      var selectedDay = [dateViewing.getMonth() + 1, dateViewing.getDate() + 1, dateViewing.getFullYear()]
 
-      // console.log('selected day' + selectedDay)
+      console.log('selected day' + selectedDay)
+      console.log('selected day' + dateViewing.toLocaleDateString())
+      // console.log('selected day' + new Date ().setMonth(1).getMonth())
+
 
       // Sends just the part of the event that occurs during that day
       // TODO: refactor to cover months/years
@@ -105,12 +219,14 @@ const NewLog = () => {
         return d2[2] > d1[2] ? "d2" : "d1"
       }
 
+      // handles logs that span mulitple dates
       if (compareDates(currentLogStartDateLocalTime, currentLogEndDateLocalTime) != 'equal')
       {
         // includes case for if its Day X - Day Y @ midnight
         // implies that enddate is greater chronologically than start date but may be new month
         if (currentLogStartDateLocalTime[1] != currentLogEndDateLocalTime[1])
         {
+          // console.log('true! ' + currentLogStartDateLocalTime[1] + ' ' + currentLogEndDateLocalTime[1])
           if (currentLogEndDateLocalTime[1] > selectedDay[1])
           {
             // sets to end of the day
@@ -155,6 +271,9 @@ const NewLog = () => {
           && currentLogStartDateLocalTime[1] == selectedDay[1]
           && currentLogStartDateLocalTime[2] == selectedDay[2])
       {
+        console.log('this date is converted because it is ' + currentLogStartDateLocalTime
+        + 'and the selected day is ' + selectedDay)
+
         var obj = data['logs'][log];
 
         // CONVERT TO LOCAL TIME
@@ -289,12 +408,83 @@ const NewLog = () => {
     return result;
   }
 
-  const isDateSelected = () => {
-    return true;
+  const getDates = () => {
+    // get first date from logs and create array of logs from now to current date
+    // beware of time zones
+    const data = getData()
+    // console.log(data['logs'][0] + ' *** GET DATA')
+    // var result = []
+
+    var firstDate = new Date()
+    var currentStartDate;
+
+    for (var log in data['logs']) 
+    {
+      // console.log('----' + firstDate.toISOString())
+      currentStartDate = parseISOString(data['logs'][log]['startDate'])
+
+      // get first date
+      if (currentStartDate < firstDate)
+      {
+        firstDate = currentStartDate
+      }
+    }
+
+    // const firstDateLocal = [firstDate.getDate(), firstDate.getMonth(), firstDate.getFullYear()]
+    // const todayDateLocal = [new Date().getDate(), new Date().getMonth(), new Date().getFullYear()]
+
+    var getDaysArray = function(start, end) {
+      for(var arr=[],dt=start; dt<=end; dt.setDate(dt.getDate()+1)){
+          arr.push(new Date(dt).toLocaleString());
+      }
+
+      if(arr[arr.length - 1].substring(2,4) != new Date().toLocaleString().substring(2,4))
+      {
+        arr.push(new Date().toLocaleString())
+      }
+
+      // for visual asthetics have an extra day
+      var nextDay = new Date()
+      nextDay.setDate(nextDay.getDate() + 1)
+      arr.push(nextDay.toLocaleString())
+
+      // console.log(arr)
+      return arr;
+    };  
+
+    return getDaysArray(firstDate, new Date())
+    // go through years, only does once if same year
+    // for (var i = firstDateLocal[2]; i < todayDateLocal[2] + 1; i++)
+    // {
+    //   for (var j = firstDateLocal[0]; j < todayDateLocal[0]; j++)
+    //   {
+
+    //   }
+    // }
+
   }
 
-  const isDateToday = () => {
-    return true;
+  // const isDateSelected = () => {
+  //   return true;
+  // }
+
+  // const isDateToday = () => {
+  //   return true;
+  // }
+
+  // const getDateSelectedDay = () => {
+    
+  //   // local time
+  //   const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  //   // const dayOfWeek = weekDays[new Date().getDay()];
+  //   console.log(new Date(dateViewing).getDay())
+  //   console.log(new Date(dateViewing).getDate())
+  //   return [weekDays[new Date(dateViewing).getDay()].substring(0, 3), new Date(dateViewing).getDate()]
+  // }
+
+  const getClippedDateViewing = () => {
+    var result = JSON.stringify(dateViewing)
+    return result.substring(1,11)
   }
 
     return (
@@ -321,79 +511,29 @@ const NewLog = () => {
         >
           {/* Date navigation */}
           <View style={{height: 64}}>
-                  <ScrollView 
-                  style={{flex: 1, left: 72, width: 123, 
+              <FlatList
+              data={getDates()}
+              renderItem={({item, index}) => {
+                  return (
+                      <SingleDate item={item} index={index} dateViewing={dateViewing} setDateViewing={setDateViewing}></SingleDate>
+                  )
+              }}
+              style={{
+               flex: 1, left: 72, width: 123, 
                   flexDirection: 'row',
-                  }}
-                  contentContainerStyle={{
-                      alignItems: 'center', justifyContent: 'center',
-                  }}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  showsVerticalScrollIndicator={false}
-                  
-                  >
-                      <View style={{width: 42, height: '100%', marginHorizontal: 4,}}>
-                          <View 
-                          style={[styles.datePickerUnSelected, isDateSelected() && styles.datePickerSelected]}
-                          >
-                              
-                              <View style={{justifyContent:'center', alignItems: 'center'}}>
-                                  <Text>Wed</Text>
-                                  <View 
-                                  style={[styles.dateCircle, isDateToday() && styles.dateCircleToday]}
-                                  >
-                                      <Text 
-                                      style={[styles.dateText, isDateToday() && styles.dateTextToday]}
-                                      >
-                                          15
-                                      </Text>
-                                  </View>
-                              </View>
-                          </View>
-                      </View>
-                      <View style={{width: 42, height: '100%', marginHorizontal: 4,}}>
-                          <View 
-                          style={[styles.datePickerUnSelected, isDateSelected() && styles.datePickerSelected]}
-                          >
-                              
-                              <View style={{justifyContent:'center', alignItems: 'center'}}>
-                                  <Text>Thu</Text>
-                                  <View 
-                                  style={[styles.dateCircle, isDateToday() && styles.dateCircleToday]}
-                                  >
-                                      <Text 
-                                      style={[styles.dateText, isDateToday() && styles.dateTextToday]}
-                                      >
-                                          16
-                                      </Text>
-                                  </View>
-                              </View>
-                          </View>
-                      </View>
-                      <View style={{width: 42, height: '100%', marginHorizontal: 4,}}>
-                          <View 
-                          style={[styles.datePickerUnSelected, isDateSelected() && styles.datePickerSelected]}
-                          >
-                              
-                              <View style={{justifyContent:'center', alignItems: 'center'}}>
-                                  <Text>Fri</Text>
-                                  <View 
-                                  style={[styles.dateCircle, isDateToday() && styles.dateCircleToday]}
-                                  >
-                                      <Text 
-                                      style={[styles.dateText, isDateToday() && styles.dateTextToday]}
-                                      >
-                                          17
-                                      </Text>
-                                  </View>
-                              </View>
-                          </View>
-                      </View>
-                  </ScrollView>
+              }}
+              contentContainerStyle={{
+                alignItems: 'center', justifyContent: 'center',
+              }}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+              // contentOffset={{x: 150, y: 0}}
+              >
+              </FlatList>
           </View>
 
-          <Calendar data={getDateViewingsData()}/>
+          <Calendar data={getDateViewingsData()} dateViewing={getClippedDateViewing()}/>
         </View>
 
         

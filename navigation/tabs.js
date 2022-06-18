@@ -56,8 +56,11 @@ const Tabs = () => {
                 tabBarIcon: ({focused}) => (
                     <TouchableOpacity
                         onPress={() => {
+                            console.log('before ' + currentScreen)
+                            navigation.navigate("newHome")
                             setCurrentScreen("newHome")
-                            console.log(currentScreen)
+                            console.log('after ' + currentScreen)
+                            
                         }}
                         activeOpacity={1}
                     >
@@ -87,14 +90,19 @@ const Tabs = () => {
                     tabBarIcon: ({focused}) => (
                         <TouchableOpacity 
                         onPress={() => {
+                            // navigation.navigate("newLog")
+                            console.log('before ' + currentScreen)
+
                             if (currentScreen == "newLog")
                             {
                                 navigation.goBack()
+                                setCurrentScreen(navigation.getState().routeNames[0])
                             } else {
                                 navigation.navigate("newLog")
                                 setCurrentScreen("newLog")
                             }
-                            console.log(currentScreen)
+                            console.log('after ' + currentScreen)
+
                         }}
                         activeOpacity={1}
                         >
@@ -135,9 +143,10 @@ const Tabs = () => {
                     tabBarIcon: ({focused}) => (
                         <TouchableOpacity
                         onPress={() => {
+                            console.log('before ' + currentScreen)
                             navigation.navigate("friends")
                             setCurrentScreen("friends")
-                            console.log(currentScreen)
+                            console.log('after ' + currentScreen)
                         }}
                         >
                             <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>

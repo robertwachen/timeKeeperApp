@@ -103,15 +103,23 @@ const Item = (props) => {
     }
 
     const imgPath = {
-
         'Startup':{
-            image: require('../assets/icons/startup.png')
+            image: require('../assets/icons/startup-fill-light.png')
+        },
+        'Waste': {
+            image: require('../assets/icons/waste-fill-light.png')
+        },
+        'Body':{
+            image: require('../assets/icons/body-fill-light.png')
+        },
+        'Social': {
+            image: require('../assets/icons/social-fill-light.png')
+        },
+        'School': {
+            image: require('../assets/icons/school-fill-light.png')
         },
         'Sleep': {
             image: require('../assets/icons/sleep.png')
-        },
-        'Waste': {
-            image: require('../assets/icons/waste.png')
         }
 
     }
@@ -128,22 +136,35 @@ const Item = (props) => {
             style={[styles.CategoryListContainer, 
             props.selectedItems.includes(props.item.category) && styles.CategoryListContainerExtended]}
             >
-                <View style={styles.CategoryListIconContainer}>
+                <View
+                style={{flexDirection:'row', alignItems: 'center'}}
+                >
                     <Image 
-                        source={imgPath[props.item.category]['image']}
-                        style={styles.CategoryListIcon}
-                    />
-                </View>
+                            source={imgPath[props.item.category]['image']}
+                            style={styles.CategoryListIconContainer}
+                        />
 
-                <View style={{marginLeft: 8}} />
-                <View>
-                    <Text style={styles.CategoryListH1}>
-                        {props.item.category}
-                    </Text>
-                    <Text style={styles.CategoryListH2}>
-                        {hoursSpent()} / {totalHours()} hours
-                    </Text>
+                    <View style={{marginLeft: 8}} />
+                    <View>
+                        <Text style={styles.CategoryListH1}>
+                            {props.item.category}
+                        </Text>
+                        <Text style={styles.CategoryListH2}>
+                            {hoursSpent()} / {totalHours()} hours
+                        </Text>
+                    </View>
                 </View>
+                
+
+                {/* {
+                    props.selectItems.includes(props.item.category) ?
+                    <View>
+                        <Text> test</Text>
+                    </View>
+                    :
+                    null
+                } */}
+                
 
                 {/* FUTURE FEATURE */}
                 {/* <View style={styles.CategoryListStatusContainer}>
@@ -190,9 +211,9 @@ const CategoryList = (props) => {
 
 const styles = StyleSheet.create({
     CategoryListContainer: {
-        // justifyContent: 'center',
-        alignItems: 'center',
-        color: '#FBFBFB',
+        justifyContent: 'flex-start',
+        // alignItems: 'flex-start',
+        backgroundColor: '#FBFBFB',
         margin: 10,
         marginBottom: 8,
         width: 336,
@@ -200,14 +221,14 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: '#E9EAE4',
         borderRadius: 40,
-        flexDirection: 'row'
+        flexDirection: 'column'
     },
     CategoryListContainerExtended: {
         height: 224,
     },
     CategoryListIconContainer: {
         // color: '#D4F2F8', // fix
-        backgroundColor: '#D4F2F8',
+        // backgroundColor: '#D4F2F8',
         borderRadius: 20,
         margin: 16,
         marginRight: 8,
@@ -220,12 +241,12 @@ const styles = StyleSheet.create({
         // alignSelf: 'flex-start',
         // add position
     },
-    CategoryListIcon: {
-        width: 32,
-        height: 32, 
-        tintColor: '#3EC7F5',
-        // add position
-    },
+    // CategoryListIcon: {
+    //     width: 32,
+    //     height: 32, 
+    //     tintColor: '#3EC7F5',
+    //     // add position
+    // },
     CategoryListH1: {
         fontSize: 18,
         fontWeight: 'bold',

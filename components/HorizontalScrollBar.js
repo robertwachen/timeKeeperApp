@@ -118,17 +118,59 @@ const Item = (props) => {
 
     // References the useState in HorizontalScrollBar
     const selectItem = (item) => {
-        const newLog = {
-            startDate: JSON.stringify(getLastDate()).substring(1, 25),
-            endDate: JSON.stringify(new Date()).substring(1, 25),
-            category: item.name,
-            subCategory: '',
+        const newLog = () => {
+            var startDate = JSON.stringify(getLastDate()).substring(1, 25);
+            var endDate = JSON.stringify(new Date()).substring(1, 25);
+
+            console.log('startdate', startDate, 'enddate', endDate)
+
+            var startMinutes = roundbyFifteen((startDate.substring(14, 16) * 1))
+            var endMinutes = roundbyFifteen((startDate.substring(14, 16) * 1))
+
+            console.log('startmin', startMinutes, 'endmin', endMinutes)
+
+
+            function roundbyFifteen (number) {
+                console.log(number)
+                if (number < 15) 
+                {
+                    return 15
+                } 
+                else if (number > 15)
+                {
+                    return 30
+                }
+                else if (number > 30)
+                {
+                    return 45
+                }
+                else if (number > 45)
+                {
+                    return 59
+                }
+                return number
+            }
+
+            startDate = startDate.substring(0, 14) + startMinutes + ":00.000Z"
+            endDate = endDate.substring(0, 14) + endMinutes + ":00.000Z"
+
+            console.log('startdate', startDate, 'enddate', endDate)
+
+            var result = {
+                startDate: startDate,
+                endDate: endDate,
+                category: item.name,
+                subCategory: '',
+            }
+
+            console.log(JSON.stringify(result))
+            return result
         }
         if (props.selectedItems.includes(item.name)) {
             props.setSelectedItems([]);
         } else {
             props.setSelectedItems([item.name]);
-            addLog('1',newLog)
+            addLog('1',newLog())
         }
 
         // console.log(props.selectedItems[0])
@@ -148,20 +190,31 @@ const Item = (props) => {
         activeOpacity={1}
         >
             <View style={{
-                flex: 1
+                flex: 1,
             }}
             // selected={getSelectedItems(item)
             // }
             >
-                <Image 
+                {/* <Image 
                     source={props.item.image}
                     style={[styles.FlatListIcon,
                         props.selectedItems.includes(props.item.name) && styles.FlatListIconPressed]}
-                >
-                </Image>
-                <View>
-                    <Text style={[styles.FlatListText,
-            props.selectedItems.includes(props.item.name) && styles.FlatListTextPressed]}>{props.item.name}</Text>
+                /> */}
+                {/* <Image 
+                    source={[props.item.image, props.selectedItems.includes(props.item.name) && props.item.imageSelected]}
+                    style={styles.FlatListIcon}
+                /> */}
+                <View style={{alignItems: 'center'}}>
+                    <Image 
+                        source={props.item.image}
+                        style={styles.FlatListIcon}
+                    />
+                    <View>
+                        <Text style={[styles.FlatListText,
+                            props.selectedItems.includes(props.item.name) && styles.FlatListTextPressed]}>
+                            {props.item.name}
+                        </Text>
+                    </View>
                 </View>
             </View>
         </TouchableOpacity>
@@ -200,22 +253,21 @@ const HorizontalScrollBar = (props) => {
 
 const styles = StyleSheet.create({
     FlatListText: {
-        color: '#000',
+        color: '#3B4043',
         padding: 10,
         fontSize: 16,
         textAlign: 'center',
         marginBottom: 16,
+        fontWeight: "500"
     },
     FlatListTextPressed: {
         color: '#0165EC',
     },
     FlatListIcon: {
-        width: 50, 
-        height: 50, 
-        marginHorizontal: 10,
-        marginRight: 16, 
+        width: 64, 
+        height: 64, 
+        marginHorizontal: 8,
         marginBottom: 4,
-        tintColor: '#000',
     },
     FlatListIconPressed: {
         tintColor:'#0165EC',
