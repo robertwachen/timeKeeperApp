@@ -12,6 +12,7 @@ const screenWidth = Dimensions.get("window").width;
 
 const NewHome = ({navigation}) => {
   // const[logs, setLogs] = useState([]);
+  const [data, setData] = useState({})
 
 
 
@@ -32,8 +33,7 @@ const NewHome = ({navigation}) => {
     });
   }
 
-  const updates = {};
-  updates['/users/1/email'] = 'testing';
+  
 
   const testingDB = ref(db, 'users/1');
   
@@ -52,7 +52,7 @@ const NewHome = ({navigation}) => {
     imagePath: '../assets/icons/waste.png',
     },
     {
-      category: 'Sleep',
+      category: 'Body',
       hours: 56,
       type: 'Budget',
       imagePath: '../assets/icons/sleep.png',
@@ -62,26 +62,47 @@ const NewHome = ({navigation}) => {
       hours: 45,
       type: 'Goal',
       imagePath: '../assets/icons/startup.png',
+    },
+    {
+      category: 'Social',
+      hours: 30,
+      type: 'Goal',
+      imagePath: '../assets/icons/startup.png',
+    },
+    {
+      category: 'School',
+      hours: 10,
+      type: 'Budget',
+      imagePath: '../assets/icons/startup.png',
     }
 ];
+
+const updates = {};
+updates['/users/1/goals'] = goalsDB;
   
   useEffect(() => {
     // writeUserData('1', 'Robert', 'Wachen', 'robert@wachenmail.com', 'password', logsDB, goalsDB)
     // update(ref(db), updates);
+    onValue(ref(db, 'users/1/'), (snapshot) => {
+      setData(snapshot.val());
+      });
     console.log('Done!')
+    console.log(JSON.stringify(data))
+    console.log('Done2!')
     // onValue(testingDB, (snapshot) => {
     //   console.log(snapshot.val());
     // });
-  });
+  }, []);
   
-  const getData = () => {
-    var data = {};
-    onValue(ref(db, 'users/1/'), (snapshot) => {
-    data = snapshot.val();
-    });
-    console.log(data)
-    return data
-  }
+  // const getData = () => {
+  //   var data = {};
+  //   onValue(ref(db, 'users/1/'), (snapshot) => {
+  //   data = snapshot.val();
+  //   });
+  //   console.log(data)
+  //   console.log('thats the data!')
+  //   return data
+  // }
 
   
 
@@ -89,20 +110,19 @@ const NewHome = ({navigation}) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{
-        margin: 16,
+        margin: 8,
       }}></View>
       <Text style={styles.h1}>Your {dayOfWeek}, Categorized</Text>
       <View style={{
         margin: 8,
       }}></View>
-      <WeekPicker></WeekPicker>
+      <WeekPicker/>
       <View style={{
-        margin: 16,
+        margin: 8,
       }}></View>
       <CategoryList 
-      data={getData()}
-      ></CategoryList>
-      
+      data={data}
+      />
 
     </SafeAreaView>
   )

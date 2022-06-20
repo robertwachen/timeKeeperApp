@@ -26,10 +26,13 @@ const SingleDate = (props) => {
         todaysDateArr[2] = todaysDateArr[1].substring(todaysDateArr[1].indexOf('/') + 1)
         todaysDateArr[1] = todaysDateArr[1].substring(0, todaysDateArr[1].indexOf('/'))
         todaysDateArr[0] = todaysDateArr[0].substring(0, todaysDateArr[0].indexOf('/'))
-  const itemDate = [props.item.substring(0, props.item.indexOf('/')), '', '']
-  itemDate[1] = [props.item.substring((props.item.indexOf('/') + 1), props.item.indexOf(',') - 5)]
-  itemDate[2] = [props.item.substring((props.item.indexOf(',') - 4), props.item.indexOf(','))]
-  const selectedDate = [new Date(props.dateViewing).toISOString().substring(5, 7), new Date(props.dateViewing).toISOString().substring(8, 10), new Date(props.dateViewing).toISOString().substring(0, 4)]
+  const itemDate = [props.item.substring(0, props.item.indexOf('/')) * 1, '', '']
+  itemDate[1] = [props.item.substring((props.item.indexOf('/') + 1), props.item.indexOf(',') - 5)] * 1
+  itemDate[2] = [props.item.substring((props.item.indexOf(',') - 4), props.item.indexOf(','))] * 1
+  // const sd2 = [new Date(props.dateViewing).toISOString().substring(5, 7), new Date(props.dateViewing).toISOString().substring(8, 10), new Date(props.dateViewing).toISOString().substring(0, 4)]
+  
+  const selectedDate = [props.dateViewing[0], props.dateViewing[1], props.dateViewing[2]]
+
   console.log(props)
   console.log("____________++++______________")
 
@@ -69,26 +72,32 @@ const SingleDate = (props) => {
   }
 
   const setSelectedDate = () => {
-    var result = new Date()
-    // console.log(result.toISOString() + '//')
+    // var result = new Date()
+    // // console.log(result.toISOString() + '//')
 
-    console.log(result.toISOString())
-    console.log(result.toLocaleDateString())
-    console.log(itemDate)
+    // console.log(result.toISOString())
+    // console.log(result.toLocaleDateString())
+    // console.log(itemDate)
     console.log("SADNJAODNOASNDISANOIDSANIO")
 
-    result.setUTCMonth((itemDate[0] * 1) - 1)
-    result.setUTCDate((itemDate[1] * 1))
-    result.setUTCFullYear(itemDate[2])
-    console.log(result.toISOString())
-
-    // console.log(result.toISOString() + '++')
-
     // result.setUTCMonth((itemDate[0] * 1) - 1)
-    // result.setUTCDate((itemDate[1] * 1) - 1)
+    // result.setUTCDate((itemDate[1] * 1))
     // result.setUTCFullYear(itemDate[2])
-    // console.log(result.toISOString() + '**')
-    props.setDateViewing(result)
+    // console.log(result.toISOString())
+
+    // // console.log(result.toISOString() + '++')
+
+    // // result.setUTCMonth((itemDate[0] * 1) - 1)
+    // // result.setUTCDate((itemDate[1] * 1) - 1)
+    // // result.setUTCFullYear(itemDate[2])
+    // // console.log(result.toISOString() + '**')
+    // props.setDateViewing(result)
+
+    // console.log(props.dateViewing)
+    props.setDateViewing(itemDate)
+    // console.log(typeof(props.dateViewing) + ':)')
+    // console.log(props.dateViewing)
+
   }
   // console.log('\n\n '+ itemDate + '\n\n ')
 
@@ -131,7 +140,23 @@ const SingleDate = (props) => {
 const NewLog = () => {
   const [selectedItems, setSelectedItems] = useState([]);
   const[logs, setLogs] = useState([]);
-  const[dateViewing, setDateViewing] = useState(new Date());
+  // const[dateViewing, setDateViewing] = useState(new Date());
+
+  const todaysDateArr = [new Date().toLocaleDateString(), '', '']
+        todaysDateArr[1] = todaysDateArr[0].substring(todaysDateArr[0].indexOf('/') + 1) 
+        todaysDateArr[2] = todaysDateArr[1].substring(todaysDateArr[1].indexOf('/') + 1)  * 1
+        todaysDateArr[1] = todaysDateArr[1].substring(0, todaysDateArr[1].indexOf('/')) * 1
+        todaysDateArr[0] = todaysDateArr[0].substring(0, todaysDateArr[0].indexOf('/')) * 1
+
+  console.log(todaysDateArr)
+  // console.log(dateViewing)
+  // [MM, DD, YYYY]
+  const[dateViewing, setDateViewing] = useState(todaysDateArr);
+  const [bubbleSelected, setBubbleSelected] = useState(null)
+  const [tapLocationY, setTapLocationY] = useState(0)
+
+  console.log(dateViewing)
+  // console.log('mioiascn')
   // console.log(dateViewing)
 
   const db = getDatabase(firebase);
@@ -155,6 +180,9 @@ const NewLog = () => {
 
   // SENDS IT IN LOCAL TIME
   const getDateViewingsData = () => {
+    console.log('dv1' + dateViewing)
+
+
     // setDateViewing(new Date().toISOString())
     // console.log(dateViewing + ' *** DATE VIEWING')
     const data = getData()
@@ -182,10 +210,10 @@ const NewLog = () => {
 
       // TODO: refactor to make scalable for months that are one or two digits
       // var selectedDay = [dateViewing.toLocaleDateString()[0], dateViewing.toLocaleDateString().substring(2,4), dateViewing.toLocaleDateString().substring(5)]
-      var selectedDay = [dateViewing.getMonth() + 1, dateViewing.getDate() + 1, dateViewing.getFullYear()]
+      var selectedDay = [dateViewing[0], dateViewing[1], dateViewing[2]]
 
       console.log('selected day' + selectedDay)
-      console.log('selected day' + dateViewing.toLocaleDateString())
+      console.log('dateviewing arr:' + dateViewing)
       // console.log('selected day' + new Date ().setMonth(1).getMonth())
 
 
@@ -482,10 +510,10 @@ const NewLog = () => {
   //   return [weekDays[new Date(dateViewing).getDay()].substring(0, 3), new Date(dateViewing).getDate()]
   // }
 
-  const getClippedDateViewing = () => {
-    var result = JSON.stringify(dateViewing)
-    return result.substring(1,11)
-  }
+  // const getClippedDateViewing = () => {
+  //   var result = JSON.stringify(dateViewing)
+  //   return result.substring(1,11)
+  // }
 
     return (
       <SafeAreaView style={{ flex: 1, flexDirection: 'row'}}>
@@ -501,6 +529,10 @@ const NewLog = () => {
             categoryData={categoryData}
             selectedItems={selectedItems}
             setSelectedItems={setSelectedItems}
+            bubbleSelected={bubbleSelected} 
+            setBubbleSelected={setBubbleSelected}
+            tapLocationY={tapLocationY}
+            setTapLocationY={setTapLocationY}
             />
           </View>
         </View>
@@ -533,7 +565,11 @@ const NewLog = () => {
               </FlatList>
           </View>
 
-          <Calendar data={getDateViewingsData()} dateViewing={getClippedDateViewing()}/>
+          <Calendar data={getDateViewingsData()} dateViewing={dateViewing} 
+          selectedItems={selectedItems} setSelectedItems={setSelectedItems}
+          bubbleSelected={bubbleSelected} setBubbleSelected={setBubbleSelected}
+          tapLocationY={tapLocationY} setTapLocationY={setTapLocationY}
+          />
         </View>
 
         

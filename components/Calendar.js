@@ -1,7 +1,10 @@
 import { useState, useEffect, Pressable } from 'react';
-import { AppRegistry, FlatList, StyleSheet, Text, View, Image, ScrollView} from 'react-native';
+import { AppRegistry, FlatList, StyleSheet, Text, View, Image, ScrollView, TouchableOpacity} from 'react-native';
 import { Dimensions } from 'react-native-web';
 import CalendarHour from './CalendarHour';
+import categoryData from '../data/categoryData';
+// import { TouchableOpacity } from 'react-native-gesture-handler';
+
 
 var lastBubbleBottomYPosition = 36;
 
@@ -118,9 +121,15 @@ var lastBubbleBottomYPosition = 36;
 //        )
 // }
 
+const todaysDateArr = [new Date().toLocaleDateString(), '', '']
+        todaysDateArr[1] = todaysDateArr[0].substring(todaysDateArr[0].indexOf('/') + 1)
+        todaysDateArr[2] = todaysDateArr[1].substring(todaysDateArr[1].indexOf('/') + 1)
+        todaysDateArr[1] = todaysDateArr[1].substring(0, todaysDateArr[1].indexOf('/'))
+        todaysDateArr[0] = todaysDateArr[0].substring(0, todaysDateArr[0].indexOf('/'))
+
 const getMinutes = (d1, d2) => {
 
-    console.log('----')
+    // console.log('----')
     // console.log(d1)
     // console.log(d2)
 
@@ -169,6 +178,8 @@ const Event = (props) => {
     // console.log('hello!!')
     // console.log(props)
 
+    // const [tapLocationY, setTapLocationY] = useState(0)
+
     function parseISOString(s) {
         var b = s.split(/\D+/);
         return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
@@ -179,33 +190,28 @@ const Event = (props) => {
     
 
     const getColor = (category) => {
+        // console.log('asdnsaiod')
+        // console.log(categoryData)
+        // return categoryData[category]['color'] - use when dictionary
         if (category == 'Waste')
         {
-            return '#CCC'
-        }
-        if (category == 'Prep')
-        {
-            return '#222'
+            return '#0CE40C'
         }
         if (category == 'School')
         {
-            return '#444'
+            return '#F53D3D'
         }
-        if (category == 'Eat')
+        if (category == 'Body')
         {
-            return '#666'
-        }
-        if (category == 'Sleep')
-        {
-            return '#888'
+            return '#F5D63D'
         }
         if (category == 'Social')
         {
-            return '#AAA'
+            return '#0DB9F2'
         }
         if (category == 'Startup')
         {
-            return '#ff00ff'
+            return '#F53DF5'
         }
         return '#000'
     }
@@ -215,7 +221,9 @@ const Event = (props) => {
     // const bubbleHeight = (getMinutes(props.item['startDate'], props.item['endDate'])) * 0.75 //this is arbitrary
     // const bubbleStartingPointY = lastBubbleBottomYPosition + 4 // arbitrary 
 
+    // console.log(props)
     const bubbleColor = getColor(props.item['category'])
+    // const bubbleColor = props.item.color
     var bubbleHeight = ((getMinutes(props.item['startDate'], props.item['endDate'])) / 15 * 36) - 4
 
     // useEffect(() => {
@@ -240,22 +248,150 @@ const Event = (props) => {
     //     // console.log('---')
     //   }, []);
     
-    console.log(props.item)
-    console.log(bubbleColor, + ' ' + bubbleHeight)
+    // console.log(props.item)
+    // console.log(bubbleColor, + ' ' + bubbleHeight)
+
+
+    function roundbyFifteen (number) {
+        console.log(number)
+        if (number < 15) 
+        {
+            return 15
+        } 
+        else if (number > 15 && number < 30)
+        {
+            return 30
+        }
+        else if (number > 30 && number < 45)
+        {
+            return 45
+        }
+        else if (number > 45)
+        {
+            return 59
+        }
+        return number
+    }
+   
+
+    // const onLayout = () => {
+    //     console.log("basketball");
+    // }
+
+    // const getOverrideCategoryHeight = () => {
+    //     // bubbleheight - taplocation (in 15m increments)
+    //     return bubbleHeight - 100
+    // }
+    
+    // const getOverrideCategoryTop = () => {
+    //     // top of element minus taplocation (in 15m increments)
+    //     return tapLocationY
+    // }
+
+    const handlePress = (evt) => {
+        // console.log('asdadnoqee')
+        // console.log(props.bubbleSelected)
+        // console.log(props.item['startDate'])
+        // props.setBubbleSelected(props.item['startDate'])
+        // console.log(props.bubbleSelected)
+
+        // return
+
+        console.log('before touch: ')
+        console.log(props.bubbleSelected)
+
+
+        // if the bubble selected is this one, deselect it
+        if (props.bubbleSelected == props.item['startDate'])
+        {
+            props.setBubbleSelected(null)
+            props.setSelectedItems([])
+        }
+        // if there is a bubble selected but its not this one, change the bubble selected
+        // if there is no bubble selected
+        else 
+        {
+            var result = Math.round(evt.nativeEvent.locationY / 36) * 36
+            props.setTapLocationY(result)
+            props.setBubbleSelected(props.item['startDate'])
+            props.setSelectedItems(props.item['category'])
+        }
+
+        // // if there is a bubble selected but its not this one, change the bubble selected
+        // else if (props.bubbleSelected != null)
+        // {
+        //     var result = Math.round(evt.nativeEvent.locationY / 36) * 36
+        //     setTapLocationY(result)
+        //     props.setBubbleSelected(props.item['startDate'])
+        // }
+
+        // // if there is no bubble selected
+        // else if (props.bubbleSelected == null)
+        // {
+        //     var result = Math.round(evt.nativeEvent.locationY / 36) * 36
+        //     setTapLocationY(result)
+        //     props.setBubbleSelected(props.item['startDate'])
+        // }
+
+        console.log('after touch: ')
+        console.log(props.bubbleSelected)
+
+        // if (bubbleSelected)
+        // {
+        //     setBubbleSelected(false)
+        // }
+        // else
+        // {
+        //     setBubbleSelected(true)
+        //     setOtherBubblesSelected(true)
+        //     // make sure taplocation is in 15m increments
+        //     var result = Math.round(evt.nativeEvent.locationY / 36) * 36
+        //     setTapLocationY(result)
+        //     console.log(tapLocationY);
+        // }
+        
+        
+        // result = ((todayDate.getHours() * 60) + (todayDate.getMinutes())) / 15 * 36;
+        // console.log(roundbyFifteen(evt.nativeEvent.locationX), roundbyFifteen(evt.nativeEvent.locationY));
+        // console.log(evt)
+    };
 
     return (
         // customize backgroundColor, height, top
-        <View style={[styles.calendarEventBubble, {backgroundColor: bubbleColor, height: bubbleHeight, 
-            // top: bubbleStartingPointY
-        }]}>
-            <Text style={{fontSize:14, fontWeight:"bold", color: "#fff"}}>{props.item['category']}</Text>
+        <View style={{zIndex:5}}
+        >
+            <TouchableOpacity
+            activeOpacity={1}
+            onPress={(evt) => handlePress(evt)}
+            >
+                <View style={[styles.calendarEventBubble, {backgroundColor: bubbleColor, height: bubbleHeight, 
+                // top: bubbleStartingPointY
+                }]}>
+                {/* this view only appears on push, shows select category */}
+                {
+                    (props.bubbleSelected == props.item['startDate']) ?
+                    <View style={[styles.calendarOverrideEventBubble, {top: props.tapLocationY, height: bubbleHeight-props.tapLocationY, position: 'absolute'}]}>
+                        <Text style={{fontSize:12, fontWeight:"bold", color: "#3B4043"}}>
+                            Select Category
+                        </Text>
+                    </View>
+                    :
+                    null
+                }
+                <Text style={{fontSize:14, fontWeight:"bold", color: "#fff"}}>{props.item['category']}</Text>
+                </View>
+            </TouchableOpacity>
         </View>
+        
        )
 }
 
 const Calendar = (props) => {
     console.log(JSON.stringify(props) + ' *** PROPS!\n\n')
     console.log(JSON.stringify(props.data) + ' *** CALENDAR DATA\n\n')
+
+    //using startdate as the key
+    // const [bubbleSelected, setBubbleSelected] = useState(null)
 
     // console.log('********')
     // console.log(props.data['logs'])
@@ -285,8 +421,9 @@ const Calendar = (props) => {
         const todayDate = new Date()
 
         var result = ((todayDate.getHours() * 60) + (todayDate.getMinutes())) / 15 * 36;
-        // size of the view, check to make sure thats the correct buffer
-        result += 17
+
+        // size of the view
+        result += 27
 
         // console.log(todayDate.getHours() + ': current time height')
         // console.log(todayDate.getMinutes() + ': current time height')
@@ -303,28 +440,40 @@ const Calendar = (props) => {
     // }
 
     const getUnfilledTimeHeight = () => {
+        console.log('gettging heiught')
+        console.log('date viewing: ' + props.dateViewing)
         var totalBubbleHeight = 0
         for (let event of props.data)
         {
             totalBubbleHeight += ((getMinutes(event['startDate'], event['endDate'])) / 15 * 36)
+            // console.log(totalBubbleHeight)
+            // console.log('asdasjsdn')
         }
-        if (totalBubbleHeight != 0) {
+        // console.log(totalBubbleHeight)
+        // console.log('final asdasjsdn')
+        if (isSelectedDateToday())
+        {
+            // console.log('cnsqio;')
+            // console.log(getCurrentTimeHeight() - totalBubbleHeight)
             return getCurrentTimeHeight() - totalBubbleHeight;
         }
-        else {
-            return "98.55%"
+        else
+        {
+            // 3487 is the pixel height from 12 AM - 12 AM
+            return 3487 - totalBubbleHeight;
         }
+        // if (totalBubbleHeight != 0) {
+        //     return getCurrentTimeHeight() - totalBubbleHeight;
+        // }
+        // else {
+        //     return "98.55%"
+        // }
         
     }
 
-    const showCurrentTimeIndicator = () => {
+    const isSelectedDateToday = () => {
 
-        const dateViewingArr = [JSON.stringify(props.dateViewing).substring(6, 8), JSON.stringify(props.dateViewing).substring(9, 11), JSON.stringify(props.dateViewing).substring(1, 5)]
-        const todaysDateArr = [new Date().toLocaleDateString(), '', '']
-        todaysDateArr[1] = todaysDateArr[0].substring(todaysDateArr[0].indexOf('/') + 1)
-        todaysDateArr[2] = todaysDateArr[1].substring(todaysDateArr[1].indexOf('/') + 1)
-        todaysDateArr[1] = todaysDateArr[1].substring(0, todaysDateArr[1].indexOf('/'))
-        todaysDateArr[0] = todaysDateArr[0].substring(0, todaysDateArr[0].indexOf('/'))
+        const dateViewingArr = [props.dateViewing[0], props.dateViewing[1], props.dateViewing[2]]
 
         if (((dateViewingArr[0] * 1) == (todaysDateArr[0] * 1)) &&
             ((dateViewingArr[1] * 1) == (todaysDateArr[1] * 1)) &&
@@ -343,7 +492,7 @@ const Calendar = (props) => {
     // console.log(JSON.stringify(props.dateViewing))
     // console.log(new Date(props.dateViewing))
     // console.log(new Date().toLocaleDateString())
-    console.log(showCurrentTimeIndicator())
+    console.log(isSelectedDateToday())
 
     return (
         <View style={{
@@ -361,6 +510,7 @@ const Calendar = (props) => {
                 <View style={{flexDirection: 'row',
                 // position: 'absolute', width: '100%', height: '100%', backgroundColor: '#ccc'
                 }}>
+                
                     {/* Left Side Times */}
                     <View style={{width: 56}}>
                         <View style={{height: 44, justifyContent: 'flex-end', alignItems:'center'}}>
@@ -447,21 +597,31 @@ const Calendar = (props) => {
                     <View style={{flex: 1}}> 
                         {/* On-Top Components */}
 
-                        
+                        {/* <View style={{position:'absolute', height:100, backgroundColor: '#000',
+                        borderWidth:1, borderColor:'#000', top: 71, zIndex:100}}/> */}
 
                         {props.data.map (
                             (item, index) => {
                                 return (
-                                    <Event item={item} key={index}></Event>
+                                    <Event item={item} key={index} 
+                                    bubbleSelected={props.bubbleSelected} setBubbleSelected={props.setBubbleSelected} 
+                                    selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems}/>
                                 )
                             }
                         )}
 
-                        <View style={[styles.calendarAddEventBubble, {height: getUnfilledTimeHeight()}]}>
+                        {
+                            // 29 is the space for one 15-minute block, it shows at the :01/:16/:31/:46
+                            (getUnfilledTimeHeight() > 29) && (props.bubbleSelected == null) ?
+                            <View style={[styles.calendarAddEventBubble, {height: getUnfilledTimeHeight()}]}>
                                 <Text style={{fontSize:12, fontWeight:"bold", color: "#3B4043"}}>
                                     Select Category
                                 </Text>
-                        </View>
+                            </View>
+                            :
+                            null
+                        }
+                        
 
                         {/* <FlatList 
                             data={props.data}
@@ -476,9 +636,11 @@ const Calendar = (props) => {
                         {/* ALT COLOR: #e43e37
                         getCurrentTimeHeight()
                          */}
+
+                         {/* Added position absolute and top to prevent the current time moving when it's filled */}
                          {
-                            showCurrentTimeIndicator() ?
-                            <View style={{zIndex: 3, justifyContent: 'center'}}>
+                            isSelectedDateToday() ?
+                            <View style={{zIndex: 3, justifyContent: 'center', position: 'absolute', top: getCurrentTimeHeight()}}>
                                 <View style={{backgroundColor: '#3B4043', height: 17, width: 17, left: 8, borderRadius: 20, justifyContent: 'center'}}>
                                     <View style={{width: 115, borderBottomColor: '#3B4043', borderBottomWidth: 1, height: 1, left: 16, justifyContent: 'center'}}></View>
                                 </View>
@@ -1223,6 +1385,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 4,
+        flexDirection: 'column'
     },
     calendarAddEventBubble: {
         width: 116,
@@ -1236,6 +1399,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    calendarOverrideEventBubble: {
+        width: 116,
+        zIndex: 3,
+        borderRadius: 8,
+        borderColor: '#3B4043',
+        borderWidth: 2,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        // alignSelf: 'flex-start'
+    }
 })
 
 

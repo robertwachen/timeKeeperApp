@@ -8,6 +8,8 @@ import categoryData from '../data/categoryData';
 
 const Item = (props) => {
     // console.log(typeof(props.data['logs'].entries()))
+    console.log('==========')
+    console.log(JSON.stringify(props))
 
     function parseISOString(s) {
         var b = s.split(/\D+/);
@@ -118,9 +120,6 @@ const Item = (props) => {
         'School': {
             image: require('../assets/icons/school-fill-light.png')
         },
-        'Sleep': {
-            image: require('../assets/icons/sleep.png')
-        }
 
     }
       
@@ -186,6 +185,8 @@ const Item = (props) => {
 const CategoryList = (props) => {
     const [categoriesOpened, setCategoriesOpened] = useState([]);
 
+    console.log(''+ JSON.stringify(props.data['goals']) + 'in category list!')
+
     return (
         <View style={{
             marginLeft: 16,
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
         // alignItems: 'flex-start',
         backgroundColor: '#FBFBFB',
         margin: 10,
-        marginBottom: 8,
+        marginBottom: 4,
         width: 336,
         height: 96,
         borderWidth: 2,

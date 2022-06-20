@@ -125,14 +125,16 @@ const WeekPicker = (props) => {
 const styles = StyleSheet.create({
     WeekButtonDeselected: {
         backgroundColor: '#FBFBFB',
-        width: 104,
-        height: 72,
+        width: 112,
+        height: 56,
         // width: '18%',
         // height: '11%',
         borderWidth: 1.5,
         borderColor: '#E9EAE4',
-        borderRadius: 30,
-        marginHorizontal: 6,
+        borderRadius: 24,
+        marginHorizontal: 5,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     WeekButtonSelected: {
         backgroundColor:'#7637FE',
@@ -140,8 +142,8 @@ const styles = StyleSheet.create({
     },
     WeekButtonH1: {
         // padding: '10%',
-        paddingTop: "15%",
-        paddingBottom: "5%",
+        // paddingTop: "15%",
+        // paddingBottom: "5%",
         textAlign: 'center',
         color: '#000',
         fontSize: 14,
