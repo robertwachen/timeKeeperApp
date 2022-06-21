@@ -3,11 +3,15 @@ import { AppRegistry, FlatList, StyleSheet, Text, View, Image } from 'react-nati
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import categoryData from '../data/categoryData';
 import { firebase } from '../config';
-import { getDatabase, ref, set, update, onValue, push } from "firebase/database";
+import { getDatabase, ref, set, update, onValue, push, remove } from "firebase/database";
 
 function roundbyFifteen (number) {
     console.log(number)
-    if (number < 15) 
+    if (number == 0)
+    {
+        return 0
+    }
+    else if (number < 15) 
     {
         return 15
     } 
@@ -137,6 +141,7 @@ const Item = (props) => {
 
     // References the useState in HorizontalScrollBar
     const selectItem = (item) => {
+        console.log('hellodsadniasodasinod')
         const newLog = (props) => {
 
             var startDate = JSON.stringify(getLastDate()).substring(1, 25);
@@ -166,59 +171,167 @@ const Item = (props) => {
             return result
         }
 
+        console.log('item', item)
+        console.log('props.selectedItems', props.selectedItems)
+        // console.log('props.selectedItemslength', props.selectedItems[0].length)
+
         // currently selecting this bubble, deselect it
+
         if (props.selectedItems == item.name) {
             props.setSelectedItems([]);
         } 
 
         // change the category of a bubble
-        else if (props.selectedItems != [])
+        else if (props.selectedItems.length > 0)
         {
+            console.log('CATEGORY CHANGE!')
             props.setSelectedItems([item.name]);
+            console.log(props.selectedItems)
 
-            return; // remove when ready
+            // return; // remove when ready
 
+            
             // gets from firebase DB
-            var oldLog;
-            var oldLogID;
+            var oldLog = []
+            var oldLogID = ''
+            var data = props.data
+            // onValue(ref(db, 'users/1/'), (snapshot) => {
+            //     data = snapshot.val();
+            // });
+            console.log('data', JSON.stringify(data))
+            console.log('props.bubbleSelected', props.bubbleSelected)
 
+            console.log('startingsadjsodasdpqdmio0wd1')
+            for (var log in data) {
+                console.log('log::::', log)
+                var obj = data[log];
+
+                console.log(obj['startDate'])
+                console.log(props.bubbleSelected)
+                console.log('-------------')
+                if (obj['startDate'] == props.bubbleSelected) 
+                {
+                    console.log('match!MINONIO')
+                    oldLog = data[log]
+                    oldLogID = data[log]['logID']
+                    console.log(oldLog)
+                }
+            }
+            console.log('oldlog', JSON.stringify(oldLog))
+            
+            var oldLogStartDate = oldLog['trueUTCStartDate']
             var oldLogOldEndDate = oldLog['endDate']
+            var oldLogCategory = oldLog['category']
+            var oldLogSubCategory = oldLog['subCategory']
+
+            console.log('oldlogID', oldLogID, 'oldlogenddate', oldLogOldEndDate)
 
             // references the position of the select category bubble using tapLocationY
             const getSelectCategoryStartDate = () => {
 
-                // 35 = padding above midnight, may be 15m rounding errors, TBD
-                var startTime = (props.tapLocationY - 35) / 36
+                /*
+                    Back-propogate through the previous events to get the time the parent bubble starts
+                    then add that to the taplocation Y to get the true time 
 
-                // TODO
-                var startHours, startMinutes;
-                var startDate
+                    Back prop is done in the loop that goes through the
+
+                    add from the local start date of the event in the first place
+                */
+
+                // intentionally in local time
+                const getStartHours = () => {
+                    var startHours = oldLog['startDate'].substring(11, 13) * 1
+                    var startMinutes = oldLog['startDate'].substring(14, 16) / 60
+                    startHours += startMinutes
+                    return startHours
+                }
+
+                // for (var log in data) {
+                //     var obj = data[log];
+
+                //     // get log local date and compare it to selected date
+                //     // then get the amount 
+    
+                //     console.log(obj['startDate'])
+                //     console.log(props.bubbleSelected)
+                //     console.log('-------------')
+                //     if (obj['startDate'] == props.bubbleSelected) 
+                //     {
+                //         console.log('match!MINONIO')
+                //         oldLog = data[log]
+                //         oldLogID = data[log]['logID']
+                //         console.log(oldLog)
+                //     }
+                // }
+
+                // 35 = padding above midnight
+                var startTime = '' + (((props.tapLocationY) / 36 / 4) + getStartHours())
+                console.log('startTime', startTime)
+
+                if (!startTime.includes('.'))
+                {
+                    startTime += '.00'
+                }
+                var startHours = startTime.substring(0, startTime.indexOf('.'))
+                // var startMinutes = startTime.substring(startTime.indexOf('.') + 1, startTime.indexOf('.') + 3)
+                var startMinutes = startTime.substring(startTime.indexOf('.') + 1)
+                if (startMinutes.length == 1)
+                {
+                    startMinutes += 0
+                }
+                startMinutes = startMinutes.substring(0, 2)
+
+                console.log(startMinutes)
+
+                startMinutes = '' + (startMinutes * 60 / 100)
+
+                console.log(startMinutes)
+
+                if (startHours.length == 1)
+                {
+                    startHours = '0' + startHours
+                }
+
+                if (startMinutes.length == 1)
+                {
+                    startMinutes = '0' + startMinutes
+                }
+
+                var startDate = props.bubbleSelected.substring(0, 10)
 
                 var result = startDate + 'T' + startHours + ':' + startMinutes + ':00.000Z'
-                // var bubbleHeight = ((getMinutes(props.item['startDate'], props.item['endDate'])) / 15 * 36) - 4
+                console.log('oldLogNewEndDate NOT CONVERTED', result)
 
+                var resultUTC = new Date(result)
+                resultUTC = new Date(resultUTC.getTime() + resultUTC.getTimezoneOffset()*60000)
+
+                return resultUTC.toISOString()
+                // var bubbleHeight = ((getMinutes(props.item['startDate'], props.item['endDate'])) / 15 * 36) - 4
             }
 
             var oldLogNewEndDate = getSelectCategoryStartDate();
+            console.log('oldLogNewEndDate', oldLogNewEndDate)
 
             var logPath ='/users/1/logs/'
-            logPath += 'asdnsaiodas' //TODO
+            logPath += oldLogID
+            console.log('logPath', logPath)
+
  
             //update the old log
             /*
                 find the log id
                 update the end date
             */
-            const updates = []
+            const updates = {}
             
             const newUpdate = {
                 endDate: oldLogNewEndDate,
-                // startDate: oldLog,
-                // category: item.name,
-                // subCategory: '',
+                startDate: oldLogStartDate,
+                category: oldLogCategory,
+                subCategory: oldLogSubCategory,
             };
             updates[logPath] = newUpdate;
-            update(ref(db), updates);
+            console.log('updates', updates)
 
             //add a new log that fills in the time
             /*
@@ -230,7 +343,7 @@ const Item = (props) => {
 
             const updateLog = () =>
             {
-                var startDate = oldLogNewEndDate;
+                var startDate = oldLogNewEndDate; // already UTC
                 var endDate = oldLogOldEndDate;
         
                 var startMinutes = roundbyFifteen((startDate.substring(14, 16) * 1))
@@ -238,30 +351,56 @@ const Item = (props) => {
     
                 startDate = startDate.substring(0, 14) + startMinutes + ":00.000Z"
                 endDate = endDate.substring(0, 14) + endMinutes + ":00.000Z"
+                console.log('old end date', endDate)
+
+                var endDateUTC = new Date(endDate)
+                endDateUTC = new Date(endDateUTC.getTime() + endDateUTC.getTimezoneOffset()*60000)
         
                 var result = {
                     startDate: startDate,
-                    endDate: endDate,
+                    endDate: endDateUTC.toISOString(),
                     category: item.name,
                     subCategory: '',
                 }
     
                 return result
             }
+            // console.log(updateLog())
 
+            console.log('ITS TIME TO UPDATE')
+            console.log(updates)
+            console.log(updateLog())
+
+            // for everything besides 15m updates
+            if (newUpdate['startDate'] != newUpdate['endDate'])
+            {
+                console.log('nionionio')
+                update(ref(db), updates);
+            }
+
+            // 15m updates, get rid of the old log
+            else
+            {
+                console.log('dasnasiodas')
+                // console.log(JSON.stringify(ref(db, logPath)))
+                remove(ref(db, logPath))
+                props.setBubbleSelected(null)
+            }
+            
             addLog('1',updateLog()) 
         }
 
-        else 
-        {
+        else {
+            console.log('here!')
             props.setSelectedItems([item.name]);
-            // addLog('1',newLog())
+            addLog('1',newLog())
 
             // animation off/on
             // setTimeout(function () {
             //     props.setSelectedItems([]);
             // }, 500);        
         }
+
 
         // console.log(props.selectedItems[0])
         // THIS WOULD BE MULTI SELECT/DESELECT
@@ -334,6 +473,8 @@ const HorizontalScrollBar = (props) => {
                         selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems}
                         bubbleSelected={props.bubbleSelected} setBubbleSelected={props.setBubbleSelected} 
                         tapLocationY={props.tapLocationY} setTapLocationY={props.setTapLocationY}
+                        absoluteTapLocationY={props.absoluteTapLocationY} setAbsoluteTapLocationY={props.setAbsoluteTapLocationY}
+                        data={props.data}
                         />
                     )
                 }}

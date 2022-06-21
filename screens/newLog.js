@@ -33,8 +33,8 @@ const SingleDate = (props) => {
   
   const selectedDate = [props.dateViewing[0], props.dateViewing[1], props.dateViewing[2]]
 
-  console.log(props)
-  console.log("____________++++______________")
+  // console.log(props)
+  // console.log("____________++++______________")
 
   const isDateToday = () => {
     // console.log(todayDate[0] * 1, todayDate[1] * 1, todayDate[2] * 1)
@@ -78,7 +78,7 @@ const SingleDate = (props) => {
     // console.log(result.toISOString())
     // console.log(result.toLocaleDateString())
     // console.log(itemDate)
-    console.log("SADNJAODNOASNDISANOIDSANIO")
+    // console.log("SADNJAODNOASNDISANOIDSANIO")
 
     // result.setUTCMonth((itemDate[0] * 1) - 1)
     // result.setUTCDate((itemDate[1] * 1))
@@ -148,14 +148,17 @@ const NewLog = () => {
         todaysDateArr[1] = todaysDateArr[1].substring(0, todaysDateArr[1].indexOf('/')) * 1
         todaysDateArr[0] = todaysDateArr[0].substring(0, todaysDateArr[0].indexOf('/')) * 1
 
-  console.log(todaysDateArr)
+  // console.log(todaysDateArr)
   // console.log(dateViewing)
   // [MM, DD, YYYY]
   const[dateViewing, setDateViewing] = useState(todaysDateArr);
   const [bubbleSelected, setBubbleSelected] = useState(null)
   const [tapLocationY, setTapLocationY] = useState(0)
 
-  console.log(dateViewing)
+  // this is for absolute positioning rather than within the view
+  const [absoluteTapLocationY, setAbsoluteTapLocationY] = useState(0)
+
+  // console.log(dateViewing)
   // console.log('mioiascn')
   // console.log(dateViewing)
 
@@ -166,9 +169,9 @@ const NewLog = () => {
     onValue(ref(db, 'users/1/'), (snapshot) => {
     data = snapshot.val();
     });
-    console.log("FROM NEWLOG.JS:")
-    console.log(data)
-    console.log('=========================================================')
+    // console.log("FROM NEWLOG.JS:")
+    // console.log(data)
+    // console.log('=========================================================')
     return data
   }
 
@@ -180,7 +183,7 @@ const NewLog = () => {
 
   // SENDS IT IN LOCAL TIME
   const getDateViewingsData = () => {
-    console.log('dv1' + dateViewing)
+    // console.log('dv1' + dateViewing)
 
 
     // setDateViewing(new Date().toISOString())
@@ -200,10 +203,10 @@ const NewLog = () => {
 
       var currentLogStartDateLocalTime = [currentLogStartDate.toLocaleDateString()[0], currentLogStartDate.toLocaleDateString().substring(2,4), currentLogStartDate.toLocaleDateString().substring(5)]
       var currentLogEndDateLocalTime = [currentLogEndDate.toLocaleDateString()[0], currentLogEndDate.toLocaleDateString().substring(2,4), currentLogEndDate.toLocaleDateString().substring(5)]
-      console.log('log day' + currentLogStartDateLocalTime + ' ' + currentLogEndDateLocalTime)
-      console.log('log day specific' + currentLogStartDate + ' ' + currentLogEndDate)
+      // console.log('log day' + currentLogStartDateLocalTime + ' ' + currentLogEndDateLocalTime)
+      // console.log('log day specific' + currentLogStartDate + ' ' + currentLogEndDate)
 
-      console.log('dv ' + dateViewing)
+      // console.log('dv ' + dateViewing)
       // var selectedDayString = parseISOString(dateViewing)
       // console.log('dv2 ' + selectedDayString)
       // console.log('=============== ' + dateViewing + ' ==================')
@@ -212,8 +215,8 @@ const NewLog = () => {
       // var selectedDay = [dateViewing.toLocaleDateString()[0], dateViewing.toLocaleDateString().substring(2,4), dateViewing.toLocaleDateString().substring(5)]
       var selectedDay = [dateViewing[0], dateViewing[1], dateViewing[2]]
 
-      console.log('selected day' + selectedDay)
-      console.log('dateviewing arr:' + dateViewing)
+      // console.log('selected day' + selectedDay)
+      // console.log('dateviewing arr:' + dateViewing)
       // console.log('selected day' + new Date ().setMonth(1).getMonth())
 
 
@@ -257,6 +260,8 @@ const NewLog = () => {
           // console.log('true! ' + currentLogStartDateLocalTime[1] + ' ' + currentLogEndDateLocalTime[1])
           if (currentLogEndDateLocalTime[1] > selectedDay[1])
           {
+            // console.log('old cled case 1', currentLogEndDate)
+
             // sets to end of the day
             currentLogEndDateLocalTime[0] = currentLogStartDateLocalTime[0];
             currentLogEndDateLocalTime[1] = currentLogStartDateLocalTime[1];
@@ -269,21 +274,32 @@ const NewLog = () => {
             currentLogEndDate.setMinutes(59)
             currentLogEndDate.setSeconds(0)
             currentLogEndDate.setMilliseconds(0)
+
+            // console.log('new cled case 1', currentLogEndDate)
           }
           else if (currentLogStartDateLocalTime[1] < selectedDay[1])
           {
             // sets to beginning of the day
+
+            // console.log('old clsd', currentLogStartDate)
+
+            // console.log('old clsdlt pre convert', currentLogStartDateLocalTime)
             currentLogStartDateLocalTime[0] = currentLogEndDateLocalTime[0];
             currentLogStartDateLocalTime[1] = currentLogEndDateLocalTime[1];
             currentLogStartDateLocalTime[2] = currentLogEndDateLocalTime[2];
+            // console.log('old clsdlt post convert', currentLogStartDateLocalTime)
 
             currentLogStartDate.setFullYear(currentLogStartDateLocalTime[2])
-            currentLogStartDate.setMonth(currentLogStartDateLocalTime[0])
+
+            // january is 0
+            currentLogStartDate.setMonth(currentLogStartDateLocalTime[0] - 1)
             currentLogStartDate.setDate(currentLogStartDateLocalTime[1])
             currentLogStartDate.setHours(0)
             currentLogStartDate.setMinutes(0)
             currentLogStartDate.setSeconds(0)
             currentLogStartDate.setMilliseconds(0)
+
+            // console.log('new clsd', currentLogStartDate)
           }
           
         }
@@ -299,18 +315,20 @@ const NewLog = () => {
           && currentLogStartDateLocalTime[1] == selectedDay[1]
           && currentLogStartDateLocalTime[2] == selectedDay[2])
       {
-        console.log('this date is converted because it is ' + currentLogStartDateLocalTime
-        + 'and the selected day is ' + selectedDay)
+        // console.log('this date is converted because it is ' + currentLogStartDateLocalTime
+        // + 'and the selected day is ' + selectedDay)
 
         var obj = data['logs'][log];
+        // console.log('hehednio', data['logs'][log])
+        var trueUTCStartDate = data['logs'][log]['startDate']
 
         // CONVERT TO LOCAL TIME
         
 
-        console.log('currentstartdateUTC ' + currentLogStartDate.toUTCString())
-        console.log('currentenddateUTC ' + currentLogEndDate.toUTCString())
-        console.log('currentstartdateLocal ' + new Date(currentLogStartDate.toUTCString()).toLocaleString())
-        console.log('currentenddateLocal ' + new Date(currentLogEndDate.toUTCString()).toLocaleString())
+        // console.log('currentstartdateUTC ' + currentLogStartDate.toUTCString())
+        // console.log('currentenddateUTC ' + currentLogEndDate.toUTCString())
+        // console.log('currentstartdateLocal ' + new Date(currentLogStartDate.toUTCString()).toLocaleString())
+        // console.log('currentenddateLocal ' + new Date(currentLogEndDate.toUTCString()).toLocaleString())
 
         var localeDate = currentLogStartDate.toLocaleString();
         // console.log(localeDate)
@@ -326,16 +344,16 @@ const NewLog = () => {
           localHours = ((localHours * 1) + 12) + ''
           // console.log(localHours)
         }
-        // console.log(localeDate)
+        // console.log('localeDate', localeDate)
         // console.log(localeDate.includes('PM'))
         // console.log(localHours)
 
         var localMinutes = localeDate.substring(localeDate.indexOf(':') + 1)
         localMinutes = localMinutes.substring(0, localMinutes.indexOf(':'))
 
-        var localDay = localeDate.substring(0, localeDate.indexOf('/'))
-        var localMonth = localeDate.substring(localeDate.indexOf('/') + 1)
-        localMonth = localMonth.substring(0, localMonth.indexOf('/'))
+        var localDay = localeDate.substring(localeDate.indexOf('/') + 1)
+        localDay = localDay.substring(0, localDay.indexOf('/'))
+        var localMonth = localeDate.substring(0, localeDate.indexOf('/'))
 
         var localYear = localeDate.substring(localeDate.indexOf('/') + 1)
         // console.log(localYear)
@@ -364,9 +382,9 @@ const NewLog = () => {
         var endDateLocalMinutes = localeEndDate.substring(localeEndDate.indexOf(':') + 1)
         endDateLocalMinutes = endDateLocalMinutes.substring(0, endDateLocalMinutes.indexOf(':'))
 
-        var endDateLocalDay = localeEndDate.substring(0, localeEndDate.indexOf('/'))
-        var endDateLocalMonth = localeEndDate.substring(localeEndDate.indexOf('/') + 1)
-        endDateLocalMonth = endDateLocalMonth.substring(0, endDateLocalMonth.indexOf('/'))
+        var endDateLocalDay = localeEndDate.substring(localeEndDate.indexOf('/') + 1)
+        endDateLocalDay = endDateLocalDay.substring(0, endDateLocalDay.indexOf('/'))
+        var endDateLocalMonth = localeEndDate.substring(0, localeEndDate.indexOf('/'))
 
         var endDateLocalYear = localeEndDate.substring(localeEndDate.indexOf('/') + 1)
         endDateLocalYear = endDateLocalYear.substring(endDateLocalYear.indexOf('/') + 1)
@@ -420,9 +438,15 @@ const NewLog = () => {
 
         obj['startDate'] = localYear + '-' + localMonth + '-' + localDay + 'T' + localHours + ':' + localMinutes + ':00.000Z'
         obj['endDate'] = endDateLocalYear + '-' + endDateLocalMonth + '-' + endDateLocalDay + 'T' + endDateLocalHours + ':' + endDateLocalMinutes + ':00.000Z'
-        console.log(obj['startDate'])
-        console.log(obj['endDate'])
-        console.log('--------------- :) ============')
+        
+        // THIS IS NOT REFLECTED IN THE FIREBASE, IT'S JUST A WAY TO MAINTAIN THE LOG PATH AND START DATE
+        obj['logID'] = log
+        obj['trueUTCStartDate'] = trueUTCStartDate;
+
+        // console.log(data['logs'][log])
+        // console.log(obj['startDate'])
+        // console.log(obj['endDate'])
+        // console.log('--------------- :) ============')
 
 
         result = [...result, obj]
@@ -433,6 +457,15 @@ const NewLog = () => {
 
     // console.log(JSON.stringify(result) + ' *** RESULT\n\n')
 
+    result.sort(function(a, b) {
+      var keyA = new Date(a.startDate),
+        keyB = new Date(b.startDate);
+      // Compare the 2 dates
+      if (keyA < keyB) return -1;
+      if (keyA > keyB) return 1;
+      return 0;
+    });
+    
     return result;
   }
 
@@ -533,6 +566,9 @@ const NewLog = () => {
             setBubbleSelected={setBubbleSelected}
             tapLocationY={tapLocationY}
             setTapLocationY={setTapLocationY}
+            absoluteTapLocationY={absoluteTapLocationY} 
+            setAbsoluteTapLocationY={setAbsoluteTapLocationY}
+            data={getDateViewingsData()}
             />
           </View>
         </View>
@@ -569,6 +605,7 @@ const NewLog = () => {
           selectedItems={selectedItems} setSelectedItems={setSelectedItems}
           bubbleSelected={bubbleSelected} setBubbleSelected={setBubbleSelected}
           tapLocationY={tapLocationY} setTapLocationY={setTapLocationY}
+          absoluteTapLocationY={absoluteTapLocationY} setAbsoluteTapLocationY={setAbsoluteTapLocationY}
           />
         </View>
 

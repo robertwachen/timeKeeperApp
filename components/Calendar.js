@@ -169,7 +169,7 @@ const getMinutes = (d1, d2) => {
     var Difference_In_Minutes = endMinutes - startMinutes;
 
     // console.log(Difference_In_Time + " diff in time ");
-    console.log(Difference_In_Minutes + " minutes ");
+    // console.log(Difference_In_Minutes + " minutes ");
 
     return Difference_In_Minutes;
 }
@@ -253,8 +253,12 @@ const Event = (props) => {
 
 
     function roundbyFifteen (number) {
-        console.log(number)
-        if (number < 15) 
+        // console.log(number)
+        if (number == 0)
+        {
+        return 0
+        }
+        else if (number < 15) 
         {
             return 15
         } 
@@ -297,8 +301,8 @@ const Event = (props) => {
 
         // return
 
-        console.log('before touch: ')
-        console.log(props.bubbleSelected)
+        // console.log('before touch: ')
+        // console.log(props.bubbleSelected)
 
 
         // if the bubble selected is this one, deselect it
@@ -311,8 +315,10 @@ const Event = (props) => {
         // if there is no bubble selected
         else 
         {
-            var result = Math.round(evt.nativeEvent.locationY / 36) * 36
-            props.setTapLocationY(result)
+            var relativeTapLocationY = Math.round(evt.nativeEvent.locationY / 36) * 36
+            var absoluteTapLocationY = Math.round(evt.nativeEvent.pageY / 36) * 36
+            props.setTapLocationY(relativeTapLocationY)
+            props.setAbsoluteTapLocationY(absoluteTapLocationY)
             props.setBubbleSelected(props.item['startDate'])
             props.setSelectedItems(props.item['category'])
         }
@@ -333,8 +339,8 @@ const Event = (props) => {
         //     props.setBubbleSelected(props.item['startDate'])
         // }
 
-        console.log('after touch: ')
-        console.log(props.bubbleSelected)
+        // console.log('after touch: ')
+        // console.log(props.bubbleSelected)
 
         // if (bubbleSelected)
         // {
@@ -387,8 +393,8 @@ const Event = (props) => {
 }
 
 const Calendar = (props) => {
-    console.log(JSON.stringify(props) + ' *** PROPS!\n\n')
-    console.log(JSON.stringify(props.data) + ' *** CALENDAR DATA\n\n')
+    // console.log(JSON.stringify(props) + ' *** PROPS!\n\n')
+    // console.log(JSON.stringify(props.data) + ' *** CALENDAR DATA\n\n')
 
     //using startdate as the key
     // const [bubbleSelected, setBubbleSelected] = useState(null)
@@ -440,8 +446,8 @@ const Calendar = (props) => {
     // }
 
     const getUnfilledTimeHeight = () => {
-        console.log('gettging heiught')
-        console.log('date viewing: ' + props.dateViewing)
+        // console.log('gettging heiught')
+        // console.log('date viewing: ' + props.dateViewing)
         var totalBubbleHeight = 0
         for (let event of props.data)
         {
@@ -492,7 +498,7 @@ const Calendar = (props) => {
     // console.log(JSON.stringify(props.dateViewing))
     // console.log(new Date(props.dateViewing))
     // console.log(new Date().toLocaleDateString())
-    console.log(isSelectedDateToday())
+    // console.log(isSelectedDateToday())
 
     return (
         <View style={{
@@ -594,7 +600,7 @@ const Calendar = (props) => {
 
 
                     {/* Right side components */}
-                    <View style={{flex: 1}}> 
+                    <View style={{flex: 1,  top: 36}}> 
                         {/* On-Top Components */}
 
                         {/* <View style={{position:'absolute', height:100, backgroundColor: '#000',
@@ -605,7 +611,10 @@ const Calendar = (props) => {
                                 return (
                                     <Event item={item} key={index} 
                                     bubbleSelected={props.bubbleSelected} setBubbleSelected={props.setBubbleSelected} 
-                                    selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems}/>
+                                    selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems}
+                                    tapLocationY={props.tapLocationY} setTapLocationY={props.setTapLocationY}
+                                    absoluteTapLocationY={props.absoluteTapLocationY} setAbsoluteTapLocationY={props.setAbsoluteTapLocationY}
+                                    />
                                 )
                             }
                         )}
