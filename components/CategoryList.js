@@ -8,8 +8,8 @@ import categoryData from '../data/categoryData';
 
 const Item = (props) => {
     // console.log(typeof(props.data['logs'].entries()))
-    console.log('==========')
-    console.log(JSON.stringify(props))
+    // console.log('==========')
+    // console.log(JSON.stringify(props))
 
     function parseISOString(s) {
         var b = s.split(/\D+/);
@@ -122,6 +122,50 @@ const Item = (props) => {
         },
 
     }
+
+    const statusType = () => {
+        const hrsSpent = hoursSpent()
+        const ttlHrs = totalHours()
+        // need today's date in week
+
+        // Day 0 is Sunday, we want the week to start on monday (1) so no +1 necessary
+        const todaysDayPosition = new Date().getDay()
+
+        const onTrackHoursSpent = (ttlHrs / 7) * todaysDayPosition
+
+        // console.log(onTrackHoursSpent)
+
+        // MAKE THIS DEPEND ON THE GOAL TYPE
+        if (hrsSpent > ttlHrs)
+        {
+            return 'Over'
+        }
+        else if (hrsSpent > onTrackHoursSpent)
+        {
+            return 'Behind'
+        }
+        else 
+        {
+            return 'On Track'
+        }
+    }
+
+    const statusColor = () => {
+        var status = statusType()
+
+        if (status == 'Over')
+        {
+            return '#EF4C4C'
+        }
+        else if (status == 'Behind')
+        {
+            return '#EFCB4C'
+        }
+        else
+        {
+            return '#31A06E'
+        }
+    }
       
     
     return (
@@ -130,48 +174,50 @@ const Item = (props) => {
         activeOpacity={1}
         >
             
-            {/* Learn how to do modal expansion, perhaps lower priority */}
             <View 
             style={[styles.CategoryListContainer, 
             props.selectedItems.includes(props.item.category) && styles.CategoryListContainerExtended]}
             >
                 <View
-                style={{flexDirection:'row', alignItems: 'center'}}
+                style={{flexDirection:'row', alignItems: 'center',}}
                 >
-                    <Image 
-                            source={imgPath[props.item.category]['image']}
-                            style={styles.CategoryListIconContainer}
+                    <View style={{flexDirection: 'row', alignItems:'center'}}>
+                        <Image 
+                                source={imgPath[props.item.category]['image']}
+                                style={styles.CategoryListIconContainer}
                         />
-
-                    <View style={{marginLeft: 8}} />
-                    <View>
-                        <Text style={styles.CategoryListH1}>
-                            {props.item.category}
-                        </Text>
-                        <Text style={styles.CategoryListH2}>
-                            {hoursSpent()} / {totalHours()} hours
-                        </Text>
+                        <View style={{marginLeft: 8}}>
+                            <Text style={styles.CategoryListH1}>
+                                {props.item.category}
+                            </Text>
+                            <Text style={styles.CategoryListH2}>
+                                {hoursSpent()} / {totalHours()} hrs
+                            </Text>
+                        </View>
                     </View>
+
+                    {/* FUTURE FEATURE */}
+                    <View style={styles.CategoryListStatusContainer}>
+                        <View style={[styles.CategoryListStatus, {backgroundColor: statusColor()}]} />
+                        <View style={{marginHorizontal: 36, width: 64}}>
+                            <Text 
+                            style={styles.CategoryListH3}
+                            >
+                                {statusType()}
+                            </Text>
+                        </View>
+                    </View>
+
+                    {/* backgroundColor: '#EFCB4C',
+        width: 16,
+        height: 16,
+        borderRadius: 20,
+        // marginRight: 8,
+        position: 'absolute',
+        left: 12,
+        // alignSelf: 'center' */}
+
                 </View>
-                
-
-                {/* {
-                    props.selectItems.includes(props.item.category) ?
-                    <View>
-                        <Text> test</Text>
-                    </View>
-                    :
-                    null
-                } */}
-                
-
-                {/* FUTURE FEATURE */}
-                {/* <View style={styles.CategoryListStatusContainer}>
-                    <View style={styles.CategoryListStatus} />
-                    <Text style={styles.CategoryListH3}>
-                        Falling Behind
-                    </Text>
-                </View> */}
             </View>
 
             {/* <View>
@@ -185,7 +231,7 @@ const Item = (props) => {
 const CategoryList = (props) => {
     const [categoriesOpened, setCategoriesOpened] = useState([]);
 
-    console.log(''+ JSON.stringify(props.data['goals']) + 'in category list!')
+    // console.log(''+ JSON.stringify(props.data['goals']) + 'in category list!')
 
     return (
         <View style={{
@@ -260,23 +306,30 @@ const styles = StyleSheet.create({
     CategoryListH3: {
         fontSize: 14,
         color:'#000',
+        // position: 'absolute',
+        // left: 0
     },
     CategoryListStatusContainer: {
         // alignSelf: 'flex-end',
-        // backgroundColor: '#000',
+        // marginRight: 'auto',
+        // backgroundColor: '#fff',
+        position: 'absolute',
+        right: 0,
         // flexBasis: '100%',
-        paddingLeft: 24,
-        width: 132,
-        // justifyContent: 'center',
-        // alignItems: 'center'
-        flexDirection: 'row'
+        // paddingRight: 16,
+        width: 96,
+        justifyContent: 'flex-start',
+        flexDirection: 'row',
+        marginRight: 16
     },
     CategoryListStatus: {
-        backgroundColor: '#EFCB4C',
+        // backgroundColor: '#EFCB4C',
         width: 16,
         height: 16,
         borderRadius: 20,
-        marginRight: 8,
+        // marginRight: 8,
+        position: 'absolute',
+        left: 12,
         // alignSelf: 'center'
     }
 })

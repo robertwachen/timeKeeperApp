@@ -1,10 +1,16 @@
 {
   "expo": {
-    "name": "AwesomeProject",
-    "slug": "AwesomeProject",
+    "name": "TimeKeeper",
+    "slug": "TimeKeeper",
     "version": "1.0.0",
+    "privacy": "unlisted",
+    "icon": "./assets/icons/timekeeper-icon.png",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.robertwachen.timekeeper"
+    }
   }
 }

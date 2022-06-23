@@ -139,6 +139,8 @@ const SingleDate = (props) => {
 
 const NewLog = () => {
   const [selectedItems, setSelectedItems] = useState([]);
+  const [numDates, setNumDates] = useState(1)
+
   const[logs, setLogs] = useState([]);
   // const[dateViewing, setDateViewing] = useState(new Date());
 
@@ -510,6 +512,9 @@ const NewLog = () => {
       arr.push(nextDay.toLocaleString())
 
       // console.log(arr)
+      useEffect(() => {
+        setNumDates(arr.length)
+      }, []);
       return arr;
     };  
 
@@ -596,7 +601,7 @@ const NewLog = () => {
               horizontal
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
-              // contentOffset={{x: 150, y: 0}}
+              contentOffset={{x: (numDates * 42) - 56, y: 0}} // 42 = single date width, 56 = offset from left
               >
               </FlatList>
           </View>

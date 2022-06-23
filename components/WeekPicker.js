@@ -3,14 +3,24 @@ import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import categoryData from '../data/categoryData';
 import {useState} from 'react'
 
-// REQUIRES PROPS OF USESTATE 'SELECTEDITEMS'
-
 const Item = (props) => {
+    // console.log(props)
 
     const selectItem = (item) => {
         // No unselect feature
-        props.setSelectedItems([item.key]);
+        console.log('here')
+        props.setWeekSelected(props.item);
+        console.log(props.weekSelected)
     }
+
+    // const getWeekTitle = () => {
+    //     const todayDate = new Date()
+    //     if (todayDate > new Date(props.item.begin))
+    //     {
+    //         console.log('asdasdmio')
+    //     }
+    //     return 'test'
+    // }
     
     return (
         <TouchableOpacity 
@@ -22,12 +32,13 @@ const Item = (props) => {
             }}
             >
                 <View style={[styles.WeekButtonDeselected,
-                        props.selectedItems.includes(props.item.key) && styles.WeekButtonSelected]}>
+                        props.weekSelected['title'] == props.item.title && styles.WeekButtonSelected]}>
                     <Text style={[styles.WeekButtonH1,
-                        props.selectedItems.includes(props.item.key) && styles.WeekButtonTextSelected]}>{props.item.week}
+                        props.weekSelected['title'] == props.item.title && styles.WeekButtonTextSelected]}>{props.item.title}
                     </Text>
                     <Text style={[styles.WeekButtonH2,
-                        props.selectedItems.includes(props.item.key) && styles.WeekButtonTextSelected]}>{props.item.description}
+                        props.weekSelected['title'] == props.item.title && styles.WeekButtonTextSelected]}>
+                            {props.item.begin.substring(0, props.item.begin.length - 5)} - {props.item.end.substring(0, props.item.end.length - 5)}
                     </Text>
                 </View>
             </View>
@@ -106,10 +117,10 @@ const WeekPicker = (props) => {
             // style={{backgroundColor:'#ccc'}}
             >
                 <FlatList 
-                data={weekData2}
+                data={props.weeksBetweenDates}
                 renderItem={({item, index}) => {
                     return (
-                        <Item item={item} index={index} selectedItems={weekPicked} setSelectedItems={setWeekPicked}></Item>
+                        <Item item={item} index={index} weekSelected={props.weekSelected} setWeekSelected={props.setWeekSelected}></Item>
                     )
                 }}
                 showsVerticalScrollIndicator={false}

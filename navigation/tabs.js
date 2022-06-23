@@ -56,10 +56,10 @@ const Tabs = () => {
                 tabBarIcon: ({focused}) => (
                     <TouchableOpacity
                         onPress={() => {
-                            console.log('before ' + currentScreen)
+                            // console.log('before ' + currentScreen)
                             navigation.navigate("newHome")
                             setCurrentScreen("newHome")
-                            console.log('after ' + currentScreen)
+                            // console.log('after ' + currentScreen)
                             
                         }}
                         activeOpacity={1}
@@ -91,7 +91,7 @@ const Tabs = () => {
                         <TouchableOpacity 
                         onPress={() => {
                             // navigation.navigate("newLog")
-                            console.log('before ' + currentScreen)
+                            // console.log('before ' + currentScreen)
 
                             if (currentScreen == "newLog")
                             {
@@ -101,7 +101,7 @@ const Tabs = () => {
                                 navigation.navigate("newLog")
                                 setCurrentScreen("newLog")
                             }
-                            console.log('after ' + currentScreen)
+                            // console.log('after ' + currentScreen)
 
                         }}
                         activeOpacity={1}
@@ -143,10 +143,10 @@ const Tabs = () => {
                     tabBarIcon: ({focused}) => (
                         <TouchableOpacity
                         onPress={() => {
-                            console.log('before ' + currentScreen)
+                            // console.log('before ' + currentScreen)
                             navigation.navigate("friends")
                             setCurrentScreen("friends")
-                            console.log('after ' + currentScreen)
+                            // console.log('after ' + currentScreen)
                         }}
                         >
                             <View style={{alignItems: 'center', justifyContent: 'center', top: 10}}>
