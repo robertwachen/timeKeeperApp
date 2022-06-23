@@ -192,6 +192,10 @@ updates['/users/1/goals'] = goalsDB;
         }
       }
 
+      useEffect(() => {
+        setWeekSelected(weeksBetweenDates[0])
+      }, []);
+      
       return weeksBetweenDates;
     };
 
