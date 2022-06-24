@@ -172,6 +172,7 @@ const Item = (props) => {
         <TouchableOpacity 
         onPress={() => selectItem(props.item)}
         activeOpacity={1}
+        // style={{backgroundColor:'#000'}}
         >
             
             <View 
@@ -235,7 +236,7 @@ const CategoryList = (props) => {
 
     return (
         <View style={{
-            marginLeft: 16,
+            // marginLeft: 16,
             flex: 1,
         }}>
             {/* <ScrollView
@@ -261,14 +262,14 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         // alignItems: 'flex-start',
         backgroundColor: '#FBFBFB',
-        margin: 10,
-        marginBottom: 4,
-        width: 336,
+        marginVertical: 6,
+        marginHorizontal: 16,
+        // width: 336,
         height: 96,
         borderWidth: 2,
         borderColor: '#E9EAE4',
         borderRadius: 40,
-        flexDirection: 'column'
+        flexDirection: 'column',
     },
     CategoryListContainerExtended: {
         height: 224,

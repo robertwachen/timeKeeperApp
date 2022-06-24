@@ -107,7 +107,7 @@ const WeekPicker = (props) => {
         return (
         <View 
         style={{
-            marginHorizontal: 8,
+            marginHorizontal: 16,
         }}
         >
             <ScrollView

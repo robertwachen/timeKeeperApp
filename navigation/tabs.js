@@ -10,6 +10,9 @@ import Log from '../screens/Log'
 import newLog from '../screens/newLog'
 import newHome from '../screens/newHome'
 
+import LoginScreen from "../screens/LoginScreen";
+import TempHome from "../screens/tempHome";
+
 const Tab = createBottomTabNavigator();
 
 const MiddleTabButton = ({children, onPress}) => (
@@ -37,10 +40,22 @@ const MiddleTabButton = ({children, onPress}) => (
 
 const Tabs = () => {
     // currentscreen only done for newlog
-    const [currentScreen, setCurrentScreen] = useState("newHome");
+    const [currentScreen, setCurrentScreen] = useState("Login");
     const navigation = useNavigation();
 
     return (
+        // <NavigationContainer>
+        //     <Stack.Navigator>
+        //         <Stack.Screen options={{ headerShown: false }} name="Login" component={LoginScreen} />
+        //         <Stack.Screen name="Home" component={TempHome} />
+        //     </Stack.Navigator>
+        // </NavigationContainer>
+
+        // <Tab.Navigator>
+        //     <Tab.Screen name="Login" component={LoginScreen}/>
+        //     <Tab.Screen name="tempHome" component={TempHome}/>
+        //     <Tab.Screen name="newHome" component={newHome} options={{headerShown: false,}}/>
+        // </Tab.Navigator>
         <Tab.Navigator tabBarOptions={{
             showLabel: false,
             style: {
@@ -51,6 +66,7 @@ const Tabs = () => {
                 borderTopWidth: '1px'
             }
         }}>
+            
             <Tab.Screen name="newHome" component={newHome} options={{
                 headerShown: false,
                 tabBarIcon: ({focused}) => (

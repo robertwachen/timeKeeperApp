@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { View, SafeAreaView, FlatList, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, SafeAreaView, FlatList, Text, StyleSheet, Dimensions, Image } from 'react-native';
 import CategoryList from '../components/CategoryList';
 import WeekPicker from '../components/WeekPicker';
-import { firebase } from '../config';
+import { firebase, auth } from '../config';
 import { getDatabase, ref, set, update, onValue } from "firebase/database";
 import categoryData from '../data/categoryData';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 
 const screenWidth = Dimensions.get("window").width;
@@ -248,15 +249,49 @@ updates['/users/1/goals'] = goalsDB;
   //   return data
   // }
 
+  const handleSignOut = () => {
+    auth
+      .signOut()
+      .then(() => {
+        navigation.navigate("Login")
+      })
+      .catch(error => alert(error.message))
+  }
   
 
   
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1}}>
       <View style={{
         margin: 8,
       }}></View>
-      <Text style={styles.h1}>Your {dayOfWeek}, Categorized</Text>
+      <View 
+      style={{
+        flexDirection: 'row', marginHorizontal: 16,
+        borderBottomWidth: 1.5, borderColor: '#E9EAE4',
+        height: 64, alignItems: 'center'
+        // backgroundColor: '#000'
+      }}
+      >
+        <Text style={[styles.h1, {left: 16}]}>Venato</Text>
+        <View
+        style={{
+          position: 'absolute',
+          right: 0
+        }}>
+          <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => handleSignOut()}
+          >
+            <Image
+              source={require('../assets/icons/profile-icon.png')}
+              style={{width: 40, height: 40}}
+            />
+          </TouchableOpacity>
+        </View>
+        
+       
+      </View>
       <View style={{
         margin: 8,
       }}></View>
