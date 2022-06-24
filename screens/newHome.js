@@ -273,7 +273,13 @@ updates['/users/1/goals'] = goalsDB;
         // backgroundColor: '#000'
       }}
       >
-        <Text style={[styles.h1, {left: 16}]}>Venato</Text>
+        <Image
+          source={require('../assets/icons/timekeeper-icon.png')}
+          style={{width: 40, height: 40, borderRadius: 12, marginLeft: 8, marginRight: 8, }}
+        >
+
+        </Image>
+        <Text style={styles.h1}>Venato</Text>
         <View
         style={{
           position: 'absolute',

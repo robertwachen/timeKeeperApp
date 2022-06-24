@@ -32,6 +32,24 @@ function roundbyFifteen (number) {
 
 // const getSelectedItems = (item) => selectedItems.includes(item.key);
 
+const SubCategory = (props) => {
+    console.log('\nasdnsaio39', props)
+    return (
+        <TouchableOpacity style={{
+            marginBottom: 8,
+        }}>
+            <View style={[styles.subCategory, {borderColor: '#f00', borderWidth: 1}]}>
+                <Text style={{
+                    fontSize: 16, 
+                    marginLeft: 8,
+                }}>
+                {props.item}
+                </Text>
+            </View>
+        </TouchableOpacity>
+    )
+}
+
 const Item = (props) => {
 
     const db = getDatabase();
@@ -141,6 +159,7 @@ const Item = (props) => {
 
     // References the useState in HorizontalScrollBar
     const selectItem = (item) => {
+
         console.log('hellodsadniasodasinod')
         const newLog = (props) => {
 
@@ -179,6 +198,7 @@ const Item = (props) => {
 
         if (props.selectedItems == item.name) {
             props.setSelectedItems([]);
+            props.setSubCategories([])
         } 
 
         // change the category of a bubble
@@ -186,6 +206,7 @@ const Item = (props) => {
         {
             console.log('CATEGORY CHANGE!')
             props.setSelectedItems([item.name]);
+            props.setSubCategories(item['subCategories'])
             console.log(props.selectedItems)
 
             // return; // remove when ready
@@ -375,7 +396,7 @@ const Item = (props) => {
             if (newUpdate['startDate'] != newUpdate['endDate'])
             {
                 console.log('nionionio')
-                update(ref(db), updates);
+                // update(ref(db), updates); // DB PUSH
             }
 
             // 15m updates, get rid of the old log
@@ -383,17 +404,18 @@ const Item = (props) => {
             {
                 console.log('dasnasiodas')
                 // console.log(JSON.stringify(ref(db, logPath)))
-                remove(ref(db, logPath))
+                // remove(ref(db, logPath)) // DB PUSH
                 props.setBubbleSelected(null)
             }
             
-            addLog('1',updateLog()) 
+            // addLog('1',updateLog()) // DB PUSH
         }
 
         else {
             console.log('here!')
             props.setSelectedItems([item.name]);
-            addLog('1',newLog())
+            props.setSubCategories(item['subCategories'])
+            // addLog('1',newLog()) // DB PUSH
 
             // animation off/on
             // setTimeout(function () {
@@ -455,6 +477,8 @@ const Item = (props) => {
 
 const HorizontalScrollBar = (props) => {
 
+    const [subCategories, setSubCategories] = useState([])
+
     return (
         <View style={{
             marginLeft: 16,
@@ -474,8 +498,9 @@ const HorizontalScrollBar = (props) => {
                         bubbleSelected={props.bubbleSelected} setBubbleSelected={props.setBubbleSelected} 
                         tapLocationY={props.tapLocationY} setTapLocationY={props.setTapLocationY}
                         absoluteTapLocationY={props.absoluteTapLocationY} setAbsoluteTapLocationY={props.setAbsoluteTapLocationY}
+                        subCategories={subCategories} setSubCategories={setSubCategories}
                         data={props.data}
-                        />
+                        />                      
                     )
                 }}
                 // numColumns={Math.ceil(props.categoryData.length / 2)}
@@ -485,6 +510,24 @@ const HorizontalScrollBar = (props) => {
                 // horizontal
                 />
             {/* </ScrollView> */}
+
+            {/* subCategories */}
+            <View style={{height: 16, justifyContent: 'center', marginBottom: 24}}>
+                <View style={{borderColor: '#000', borderWidth: 1, borderWidth:1}}/>
+            </View>
+            <FlatList 
+                data={subCategories}
+                renderItem={({item, index}) => {
+                    return (
+                        <SubCategory item={item} index={index} 
+                        selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems}
+                        />                      
+                    )
+                }}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                style={{height: 180}}
+            />
         </View>
     );
 }
@@ -527,6 +570,14 @@ const styles = StyleSheet.create({
     },
     FlatListIconPressed: {
         tintColor:'#fff',
+    },
+    subCategory: {
+        height: 32,
+        justifyContent: 'center',
+        borderRadius: 8
+    },
+    subCategorySelected: {
+        color:'#fff',
     }
 })
 

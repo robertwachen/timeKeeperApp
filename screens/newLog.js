@@ -562,7 +562,7 @@ const NewLog = () => {
           <Text style={styles.h1}>
             Log Your Time
           </Text>
-          <View style={{justifyContent: 'center', flex: 1}}>
+          <View style={{flex: 1, marginTop: 32}}>
             <HorizontalScrollBar
             categoryData={categoryData}
             selectedItems={selectedItems}
