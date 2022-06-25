@@ -51,7 +51,7 @@ const NewHome = ({navigation}) => {
     startDate: '2022-06-14T23:15:30.423Z',
     endDate: '2022-06-14T23:16:00.423Z',
     category: 'Sleep',
-    subCategory: '',
+    subCategory: 'Uncategorized',
   }];
 
   const goalsDB = [
@@ -275,7 +275,7 @@ updates['/users/1/goals'] = goalsDB;
       >
         <Image
           source={require('../assets/icons/timekeeper-icon.png')}
-          style={{width: 40, height: 40, borderRadius: 12, marginLeft: 8, marginRight: 8, }}
+          style={{width: 40, height: 40, borderRadius: 12, marginLeft: 8, marginRight: 8}}
         >
 
         </Image>

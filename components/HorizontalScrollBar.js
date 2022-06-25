@@ -5,6 +5,9 @@ import categoryData from '../data/categoryData';
 import { firebase } from '../config';
 import { getDatabase, ref, set, update, onValue, push, remove } from "firebase/database";
 
+TouchableOpacity.defaultProps = {...(TouchableOpacity.defaultProps || {}), delayPressIn: 0};
+
+
 function roundbyFifteen (number) {
     console.log(number)
     if (number == 0)
@@ -33,16 +36,146 @@ function roundbyFifteen (number) {
 // const getSelectedItems = (item) => selectedItems.includes(item.key);
 
 const SubCategory = (props) => {
+    const db = getDatabase();
+
     console.log('\nasdnsaio39', props)
+
+    const getColor = () => {
+        var result = categoryData.filter(obj => { return obj.name == props.selectedItems[0]})[0]['color']
+        console.log('sdniqsow9', result)
+        return result
+    }
+
+    const setSubCategory = () => {
+        // Sets it locally
+        props.setSelectedItems([props.selectedItems[0], props.item])
+        console.log('891nuo')
+
+        // Pushes to database
+
+        var data = props.data
+
+        var endDateFromFirebase = ''
+
+
+        for (var log in data) {
+            var obj = data[log];
+
+            // Max date so it only matters for date split
+            // This matters because the useState updates asynchronously so it won't catch the match
+            const currentDateState = '9999-99-99T99:99:99Z'
+
+            // accounts for the log spliting over two different days
+            if (new Date(props.bubbleSelected).getUTCDate() < new Date(obj['startDate']).getUTCDate())
+            {
+                var newDate = new Date(obj['startDate'])
+                console.log('//')
+                console.log(newDate)
+                console.log('true!!sa', newDate.toISOString(), newDate.getUTCFullYear(),
+                newDate.getUTCMonth(), newDate.getUTCDate())
+
+                var newDay = newDate.getUTCDate()
+                if (newDay < 10)
+                {
+                    newDay = '0' + newDay
+                }
+
+                var newMonth = newDate.getUTCMonth() + 1
+                if (newMonth < 10)
+                {
+                    newMonth = '0' + newMonth
+                }
+
+                const newDateString = newDate.getUTCFullYear() + '-' + newMonth + '-' +
+                    newDay + "T00:00:00.000Z"
+
+                console.log(newDateString +'///')
+                props.setBubbleSelected(newDateString)
+                currentDateState = newDateString
+            }
+
+            // figure out how to do the comparison
+            console.log(obj['startDate'], props.bubbleSelected)
+
+            if (obj['startDate'] == props.bubbleSelected || obj['startDate'] == currentDateState) 
+            {
+                console.log('Match!')
+                oldLog = data[log]
+                oldLogID = data[log]['logID']
+
+                const addTime = function (startDate, time) {
+                    startDate.setMinutes(startDate.getMinutes() + time);
+                    return startDate;
+                };
+                
+                endDateFromFirebase = new Date(data[log]['endDate'])
+                endDateFromFirebase = addTime(endDateFromFirebase, endDateFromFirebase.getTimezoneOffset())
+
+                const updates = {}
+
+                console.log(JSON.stringify(oldLog), 'dsaioq')
+            
+                const newUpdate = {
+                    // these two need to be converted to UTC time
+                    startDate: data[log]['trueUTCStartDate'],
+                    endDate: endDateFromFirebase,
+
+                    category: oldLog['category'],
+
+                    // this is the change
+                    subCategory: props.item,
+                };
+
+                var logPath ='/users/1/logs/'
+                logPath += oldLogID
+
+                updates[logPath] = newUpdate;
+                update(ref(db), updates);
+
+            }
+        }
+        console.log('done\n\n')
+    }
+
+    const isSubCategorySelected = () => {
+        if (props.selectedItems[1] == props.item)
+        {
+            return true
+        }
+        else 
+        {
+            return false
+        }
+    }
+
     return (
-        <TouchableOpacity style={{
+        <TouchableOpacity 
+            style={{
             marginBottom: 8,
-        }}>
-            <View style={[styles.subCategory, {borderColor: '#f00', borderWidth: 1}]}>
-                <Text style={{
-                    fontSize: 16, 
-                    marginLeft: 8,
-                }}>
+            }}
+            onPress={setSubCategory}
+            activeOpacity={1}
+        >
+            <View style={
+                    [
+                        styles.subCategory, 
+                        isSubCategorySelected() ?
+                        {backgroundColor: getColor(), color: '#fff'}
+                        :
+                        {borderColor: getColor(), borderWidth: 1}
+                    ]
+                }>
+                <Text style={
+                    [
+                        {
+                        fontSize: 16, 
+                        marginLeft: 8,
+                        }, 
+                        isSubCategorySelected() ?
+                        {color: '#fff'}
+                        :
+                        {color: '#000'}
+                ]}>
                 {props.item}
                 </Text>
             </View>
@@ -183,7 +316,7 @@ const Item = (props) => {
                 startDate: startDate,
                 endDate: endDate,
                 category: item.name,
-                subCategory: '',
+                subCategory: 'Uncategorized',
             }
 
             console.log(JSON.stringify(result))
@@ -195,21 +328,20 @@ const Item = (props) => {
         // console.log('props.selectedItemslength', props.selectedItems[0].length)
 
         // currently selecting this bubble, deselect it
-
-        if (props.selectedItems == item.name) {
+        if (props.selectedItems[0] == item.name) {
+            // console.log('\n asda' + JSON.stringify(props))
             props.setSelectedItems([]);
-            props.setSubCategories([])
+            props.setSubCategories([]);
+            props.setBubbleSelected(props.data['endDate']);
         } 
 
         // change the category of a bubble
         else if (props.selectedItems.length > 0)
         {
             console.log('CATEGORY CHANGE!')
-            props.setSelectedItems([item.name]);
+            props.setSelectedItems([item.name, 'Uncategorized']);
             props.setSubCategories(item['subCategories'])
             console.log(props.selectedItems)
-
-            // return; // remove when ready
 
             
             // gets from firebase DB
@@ -381,7 +513,7 @@ const Item = (props) => {
                     startDate: startDate,
                     endDate: endDateUTC.toISOString(),
                     category: item.name,
-                    subCategory: '',
+                    subCategory: 'Uncategorized',
                 }
     
                 return result
@@ -396,7 +528,7 @@ const Item = (props) => {
             if (newUpdate['startDate'] != newUpdate['endDate'])
             {
                 console.log('nionionio')
-                // update(ref(db), updates); // DB PUSH
+                update(ref(db), updates); // DB PUSH
             }
 
             // 15m updates, get rid of the old log
@@ -404,18 +536,22 @@ const Item = (props) => {
             {
                 console.log('dasnasiodas')
                 // console.log(JSON.stringify(ref(db, logPath)))
-                // remove(ref(db, logPath)) // DB PUSH
+                remove(ref(db, logPath)) // DB PUSH
                 props.setBubbleSelected(null)
             }
             
-            // addLog('1',updateLog()) // DB PUSH
+            addLog('1',updateLog()) // DB PUSH
         }
 
+        // adding a new log
         else {
             console.log('here!')
-            props.setSelectedItems([item.name]);
+            props.setSelectedItems([item.name, 'Uncategorized']);
             props.setSubCategories(item['subCategories'])
-            // addLog('1',newLog()) // DB PUSH
+
+            // get this logs data
+            props.setBubbleSelected(newLog()['startDate'])
+            addLog('1',newLog()) // DB PUSH
 
             // animation off/on
             // setTimeout(function () {
@@ -443,29 +579,18 @@ const Item = (props) => {
             <View style={{
                 flex: 1,
             }}
-            // selected={getSelectedItems(item)
-            // }
             >
-                {/* <Image 
-                    source={props.item.image}
-                    style={[styles.FlatListIcon,
-                        props.selectedItems.includes(props.item.name) && styles.FlatListIconPressed]}
-                /> */}
-                {/* <Image 
-                    source={[props.item.image, props.selectedItems.includes(props.item.name) && props.item.imageSelected]}
-                    style={styles.FlatListIcon}
-                /> */}
                 <View style={{alignItems: 'center'}}>
                     <View
-                    style={[styles.FlatListIconContainer, {borderColor: props.item.color}, props.selectedItems.includes(props.item.name) && {backgroundColor: props.item.color}]}>
+                    style={[styles.FlatListIconContainer, {borderColor: props.item.color}, (props.selectedItems[0] == props.item.name) && {backgroundColor: props.item.color}]}>
                         <Image 
                             source={props.item.image}
-                            style={[styles.FlatListIcon, props.selectedItems.includes(props.item.name) && styles.FlatListIconPressed]}
+                            style={[styles.FlatListIcon, (props.selectedItems[0] == props.item.name) && styles.FlatListIconPressed]}
                         />
                     </View>
                     <View>
                         <Text style={[styles.FlatListText,
-                            props.selectedItems.includes(props.item.name) && {color: props.item.color}]}>
+                            (props.selectedItems[0] == props.item.name) && {color: props.item.color}]}>
                             {props.item.name}
                         </Text>
                     </View>
@@ -476,8 +601,6 @@ const Item = (props) => {
 }
 
 const HorizontalScrollBar = (props) => {
-
-    const [subCategories, setSubCategories] = useState([])
 
     return (
         <View style={{
@@ -498,7 +621,7 @@ const HorizontalScrollBar = (props) => {
                         bubbleSelected={props.bubbleSelected} setBubbleSelected={props.setBubbleSelected} 
                         tapLocationY={props.tapLocationY} setTapLocationY={props.setTapLocationY}
                         absoluteTapLocationY={props.absoluteTapLocationY} setAbsoluteTapLocationY={props.setAbsoluteTapLocationY}
-                        subCategories={subCategories} setSubCategories={setSubCategories}
+                        subCategories={props.subCategories} setSubCategories={props.setSubCategories}
                         data={props.data}
                         />                      
                     )
@@ -516,11 +639,13 @@ const HorizontalScrollBar = (props) => {
                 <View style={{borderColor: '#000', borderWidth: 1, borderWidth:1}}/>
             </View>
             <FlatList 
-                data={subCategories}
+                data={props.subCategories}
                 renderItem={({item, index}) => {
                     return (
                         <SubCategory item={item} index={index} 
                         selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems}
+                        bubbleSelected={props.bubbleSelected} setBubbleSelected={props.setBubbleSelected} 
+                        data={props.data}
                         />                      
                     )
                 }}

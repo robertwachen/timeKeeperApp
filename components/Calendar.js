@@ -3,123 +3,6 @@ import { AppRegistry, FlatList, StyleSheet, Text, View, Image, ScrollView, Touch
 import { Dimensions } from 'react-native-web';
 import CalendarHour from './CalendarHour';
 import categoryData from '../data/categoryData';
-// import { TouchableOpacity } from 'react-native-gesture-handler';
-
-
-var lastBubbleBottomYPosition = 36;
-
-// const Event = (props) => {
-//     // console.log('hello!!')
-//     // console.log(props)
-
-//     function parseISOString(s) {
-//         var b = s.split(/\D+/);
-//         return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
-//       }
-      
-
-//     // ASSUMES ITS BEING GIVEN TWO TIMES ON THE SAME DAY + 15 MINUTE INCREMENTS
-//     const getMinutes = (d1, d2) => {
-
-//         console.log('----')
-//         // console.log(d1)
-//         // console.log(d2)
-
-//         var startDateMinutes = d1.substring(d1.indexOf(':') + 1)
-//         startDateMinutes = startDateMinutes.substring(0, startDateMinutes.indexOf(':'));
-
-//         var startDateHours = d1.substring(d1.indexOf('T') + 1, d1.indexOf(':'))
-        
-//         var endDateMinutes = d2.substring(d2.indexOf(':') + 1)
-//         endDateMinutes = endDateMinutes.substring(0, endDateMinutes.indexOf(':'));
-
-//         var endDateHours = d2.substring(d2.indexOf('T') + 1, d2.indexOf(':'))
-
-//         // console.log(startDateMinutes + '??+' + startDateHours)
-//         // console.log(endDateMinutes + '+' + endDateHours)
-
-//         var startMinutes = (startDateHours * 60) + (startDateMinutes * 1)
-//         var endMinutes = (endDateHours * 60) + (endDateMinutes * 1)
-//         // console.log(startMinutes + ' ' + endMinutes)
-
-        
-
-//         // var startDate = parseISOString(d1)
-//         // var endDate = parseISOString(d2)
-//         // startDate.setSeconds(0)
-//         // endDate.setSeconds(0)
-//         // startDate.setMilliseconds(0)
-//         // endDate.setMilliseconds(0)
-
-//         // // To calculate the time difference of two dates
-//         // console.log(startDate.getTime() + " start date time " + startDate);
-//         // console.log(endDate.getTime() + " end date time " + endDate);
-//         // console.log (endDate - startDate)
-//         // var Difference_In_Time = endDate.getTime() - startDate.getTime();
-
-//         // var Difference_In_Minutes = Difference_In_Time / (1000 * 60);
-//         var Difference_In_Minutes = endMinutes - startMinutes;
-
-//         // console.log(Difference_In_Time + " diff in time ");
-//         console.log(Difference_In_Minutes + " minutes ");
-
-//         return Difference_In_Minutes;
-//     }
-
-//     const getColor = (category) => {
-//         if (category == 'Waste')
-//         {
-//             return '#CCC'
-//         }
-//         if (category == 'Prep')
-//         {
-//             return '#222'
-//         }
-//         if (category == 'School')
-//         {
-//             return '#444'
-//         }
-//         if (category == 'Eat')
-//         {
-//             return '#666'
-//         }
-//         if (category == 'Sleep')
-//         {
-//             return '#888'
-//         }
-//         if (category == 'Social')
-//         {
-//             return '#AAA'
-//         }
-//         if (category == 'Startup')
-//         {
-//             return '#ff00ff'
-//         }
-//         return '#000'
-//     }
-
-
-//     // const bubbleColor = getColor(props.item['category'])
-//     // const bubbleHeight = (getMinutes(props.item['startDate'], props.item['endDate'])) * 0.75 //this is arbitrary
-//     // const bubbleStartingPointY = lastBubbleBottomYPosition + 4 // arbitrary 
-
-//     const bubbleColor = getColor(props.item['category'])
-//     var bubbleHeight = ((getMinutes(props.item['startDate'], props.item['endDate'])) / 15 * 36) - 4
-//     const bubbleStartingPointY = lastBubbleBottomYPosition
-
-//     lastBubbleBottomYPosition += bubbleHeight + 4;
-//     // console.log(bubbleStartingPointY + " " + lastBubbleBottomYPosition)
-
-//     console.log(props.item)
-//     console.log(bubbleColor, + ' ' + bubbleHeight + ' ' + bubbleStartingPointY)
-
-//     return (
-//         // customize backgroundColor, height, top
-//         <View style={[styles.calendarEventBubble, {backgroundColor: bubbleColor, height: bubbleHeight, top: bubbleStartingPointY}]}>
-//             <Text style={{fontSize:14, fontWeight:"bold", color: "#fff"}}>{props.item['category']}</Text>
-//         </View>
-//        )
-// }
 
 const todaysDateArr = [new Date().toLocaleDateString(), '', '']
         todaysDateArr[1] = todaysDateArr[0].substring(todaysDateArr[0].indexOf('/') + 1)
@@ -226,32 +109,6 @@ const Event = (props) => {
     // const bubbleColor = props.item.color
     var bubbleHeight = ((getMinutes(props.item['startDate'], props.item['endDate'])) / 15 * 36) - 4
 
-    // useEffect(() => {
-    //     props.setLastBubbleBottomYPosition(bubbleStartingPointY + bubbleHeight + 4)
-    //   }, []);
-    
-
-    // setLastBubbleBottomYPosition(bubbleStartingPointY + bubbleHeight + 4)
-    // lastBubbleBottomYPosition += bubbleHeight + 4;
-    // console.log(bubbleStartingPointY + " " + lastBubbleBottomYPosition)
-
-    // useEffect(() => {
-    //     // console.log(props.lastBubbleBottomYPosition)
-    //     // console.log(bubbleStartingPointY)
-    //     // console.log(bubbleHeight)
-    //     const setNewStartingPosition = () => {
-    //         props.setLastBubbleBottomYPosition(bubbleStartingPointY + bubbleHeight + 4)
-    //     }
-    //     setNewStartingPosition();
-    //     // console.log('done! :) new pos:')
-    //     // console.log(props.lastBubbleBottomYPosition)
-    //     // console.log('---')
-    //   }, []);
-    
-    // console.log(props.item)
-    // console.log(bubbleColor, + ' ' + bubbleHeight)
-
-
     function roundbyFifteen (number) {
         // console.log(number)
         if (number == 0)
@@ -276,21 +133,11 @@ const Event = (props) => {
         }
         return number
     }
-   
 
-    // const onLayout = () => {
-    //     console.log("basketball");
-    // }
-
-    // const getOverrideCategoryHeight = () => {
-    //     // bubbleheight - taplocation (in 15m increments)
-    //     return bubbleHeight - 100
-    // }
-    
-    // const getOverrideCategoryTop = () => {
-    //     // top of element minus taplocation (in 15m increments)
-    //     return tapLocationY
-    // }
+    const getSubcategories = (category) => {
+        var result = categoryData.filter(obj => { return obj.name == category})
+        return result[0]['subCategories']
+    }
 
     const handlePress = (evt) => {
         // console.log('asdadnoqee')
@@ -310,6 +157,7 @@ const Event = (props) => {
         {
             props.setBubbleSelected(null)
             props.setSelectedItems([])
+            props.setSubCategories(null)
         }
         // if there is a bubble selected but its not this one, change the bubble selected
         // if there is no bubble selected
@@ -320,7 +168,8 @@ const Event = (props) => {
             props.setTapLocationY(relativeTapLocationY)
             props.setAbsoluteTapLocationY(absoluteTapLocationY)
             props.setBubbleSelected(props.item['startDate'])
-            props.setSelectedItems(props.item['category'])
+            props.setSubCategories(getSubcategories(props.item['category']))
+            props.setSelectedItems([props.item['category'], props.item['subCategory']])
         }
 
         // // if there is a bubble selected but its not this one, change the bubble selected
@@ -393,33 +242,6 @@ const Event = (props) => {
 }
 
 const Calendar = (props) => {
-    // console.log(JSON.stringify(props) + ' *** PROPS!\n\n')
-    // console.log(JSON.stringify(props.data) + ' *** CALENDAR DATA\n\n')
-
-    //using startdate as the key
-    // const [bubbleSelected, setBubbleSelected] = useState(null)
-
-    // console.log('********')
-    // console.log(props.data['logs'])
-
-    // const logData = () => {
-    //     var result = []
-    //     for (var log in props.data['logs']) {
-    //         var obj = props.data['logs'][log];
-    //         // console.log(obj)
-    //         result = [...result, obj]
-    //     }
-    //     return result
-    // }
-    /*
-        1. sort logs by time
-        2. send the logs relevant to each calendar hour to that calendar hour
-        3. send the log information (top/mid/bottom + color + potential text?) to the calendarsection
-    */
-
-    /*
-        For each log, create a display with hard coded values
-    */
 
     const getCurrentTimeHeight = () => {
         // THIS IS IN LOCAL TIME ZONE
@@ -614,6 +436,7 @@ const Calendar = (props) => {
                                     selectedItems={props.selectedItems} setSelectedItems={props.setSelectedItems}
                                     tapLocationY={props.tapLocationY} setTapLocationY={props.setTapLocationY}
                                     absoluteTapLocationY={props.absoluteTapLocationY} setAbsoluteTapLocationY={props.setAbsoluteTapLocationY}
+                                    subCategories={props.subCategories} setSubCategories={props.setSubCategories}
                                     />
                                 )
                             }
@@ -630,17 +453,6 @@ const Calendar = (props) => {
                             :
                             null
                         }
-                        
-
-                        {/* <FlatList 
-                            data={props.data}
-                            renderItem={({item, index}) => {
-                                return (
-                                    <Event item={item} index={index} lastBubbleBottomYPosition={lastBubbleBottomYPosition} setLastBubbleBottomYPosition={setLastBubbleBottomYPosition}></Event>
-                                )
-                            }}
-                            style={{zIndex: 2, position: 'absolute', width: '100%', height: '100%'}}
-                        ></FlatList> */}
 
                         {/* ALT COLOR: #e43e37
                         getCurrentTimeHeight()

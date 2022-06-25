@@ -156,6 +156,7 @@ const NewLog = () => {
   const[dateViewing, setDateViewing] = useState(todaysDateArr);
   const [bubbleSelected, setBubbleSelected] = useState(null)
   const [tapLocationY, setTapLocationY] = useState(0)
+  const [subCategories, setSubCategories] = useState([])
 
   // this is for absolute positioning rather than within the view
   const [absoluteTapLocationY, setAbsoluteTapLocationY] = useState(0)
@@ -573,6 +574,8 @@ const NewLog = () => {
             setTapLocationY={setTapLocationY}
             absoluteTapLocationY={absoluteTapLocationY} 
             setAbsoluteTapLocationY={setAbsoluteTapLocationY}
+            subCategories={subCategories} 
+            setSubCategories={setSubCategories}
             data={getDateViewingsData()}
             />
           </View>
@@ -611,6 +614,7 @@ const NewLog = () => {
           bubbleSelected={bubbleSelected} setBubbleSelected={setBubbleSelected}
           tapLocationY={tapLocationY} setTapLocationY={setTapLocationY}
           absoluteTapLocationY={absoluteTapLocationY} setAbsoluteTapLocationY={setAbsoluteTapLocationY}
+          subCategories={subCategories} setSubCategories={setSubCategories}
           />
         </View>
 
