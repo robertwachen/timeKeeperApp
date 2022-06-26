@@ -15,7 +15,7 @@ import * as SQLite from "expo-sqlite";
 import { get } from 'react-native/Libraries/Utilities/PixelRatio';
 import { clearUpdateCacheExperimentalAsync } from 'expo-updates';
 import Calendar from '../components/Calendar';
-import { firebase } from '../config';
+import { firebase, auth } from '../config';
 import { getDatabase, ref, set, update, onValue } from "firebase/database";
 
 // Convert to Flatlist and render one by one so you can do usestate styling
@@ -169,7 +169,7 @@ const NewLog = () => {
 
   const getData = () => {
     var data = {};
-    onValue(ref(db, 'users/1/'), (snapshot) => {
+    onValue(ref(db, 'users/' + auth.currentUser.uid + '/'), (snapshot) => {
     data = snapshot.val();
     });
     // console.log("FROM NEWLOG.JS:")
@@ -179,6 +179,7 @@ const NewLog = () => {
   }
 
   function parseISOString(s) {
+    console.log('=========', s)
     var b = s.split(/\D+/);
     return new Date(Date.UTC(b[0], --b[1], b[2], b[3], b[4], b[5], b[6]));
   }
@@ -186,290 +187,308 @@ const NewLog = () => {
 
   // SENDS IT IN LOCAL TIME
   const getDateViewingsData = () => {
-    // console.log('dv1' + dateViewing)
-
-
-    // setDateViewing(new Date().toISOString())
-    // console.log(dateViewing + ' *** DATE VIEWING')
-    const data = getData()
-    // console.log(data['logs'][0] + ' *** GET DATA')
-    var result = []
-
-    for (var log in data['logs']) 
-    {
-      // console.log('test')
-      var currentLogStartDate = parseISOString(data['logs'][log]['startDate'])
-      var currentLogEndDate = parseISOString(data['logs'][log]['endDate'])
-      // console.log(currentLogStartDate)
-      // var currentLogStartDateLocalTime = parseISOString(currentLogStartDate.toLocaleTimeString())
-      // console.log('now LOCAL time: ' + currentLogStartDate.toLocaleDateString())
-
-      var currentLogStartDateLocalTime = [currentLogStartDate.toLocaleDateString()[0], currentLogStartDate.toLocaleDateString().substring(2,4), currentLogStartDate.toLocaleDateString().substring(5)]
-      var currentLogEndDateLocalTime = [currentLogEndDate.toLocaleDateString()[0], currentLogEndDate.toLocaleDateString().substring(2,4), currentLogEndDate.toLocaleDateString().substring(5)]
-      // console.log('log day' + currentLogStartDateLocalTime + ' ' + currentLogEndDateLocalTime)
-      // console.log('log day specific' + currentLogStartDate + ' ' + currentLogEndDate)
-
-      // console.log('dv ' + dateViewing)
-      // var selectedDayString = parseISOString(dateViewing)
-      // console.log('dv2 ' + selectedDayString)
-      // console.log('=============== ' + dateViewing + ' ==================')
-
-      // TODO: refactor to make scalable for months that are one or two digits
-      // var selectedDay = [dateViewing.toLocaleDateString()[0], dateViewing.toLocaleDateString().substring(2,4), dateViewing.toLocaleDateString().substring(5)]
-      var selectedDay = [dateViewing[0], dateViewing[1], dateViewing[2]]
-
-      // console.log('selected day' + selectedDay)
-      // console.log('dateviewing arr:' + dateViewing)
-      // console.log('selected day' + new Date ().setMonth(1).getMonth())
-
-
-      // Sends just the part of the event that occurs during that day
-      // TODO: refactor to cover months/years
-
-      // returns a string of the greater date or equal
-      // format: [DD, MM, YYYY]
-      function compareDates (d1, d2) {
-        // same year
-        if(d1[2] == d2[2])
-        {
-          // same month
-          if(d1[0] == d2[0])
-          {
-            // same day
-            if(d1[1] == d2[1])
-            {
-              return "equal"
-            }
-            
-            // same month diff days
-            return d2[1] > d1[1] ? "d2" : "d1"
-          }
-
-          // same year diff months
-          return d2[0] > d1[0] ? "d2" : "d1"
-        }
-
-        // diff years
-        return d2[2] > d1[2] ? "d2" : "d1"
-      }
-
-      // handles logs that span mulitple dates
-      if (compareDates(currentLogStartDateLocalTime, currentLogEndDateLocalTime) != 'equal')
-      {
-        // includes case for if its Day X - Day Y @ midnight
-        // implies that enddate is greater chronologically than start date but may be new month
-        if (currentLogStartDateLocalTime[1] != currentLogEndDateLocalTime[1])
-        {
-          // console.log('true! ' + currentLogStartDateLocalTime[1] + ' ' + currentLogEndDateLocalTime[1])
-          if (currentLogEndDateLocalTime[1] > selectedDay[1])
-          {
-            // console.log('old cled case 1', currentLogEndDate)
-
-            // sets to end of the day
-            currentLogEndDateLocalTime[0] = currentLogStartDateLocalTime[0];
-            currentLogEndDateLocalTime[1] = currentLogStartDateLocalTime[1];
-            currentLogEndDateLocalTime[2] = currentLogStartDateLocalTime[2];
-
-            currentLogEndDate.setFullYear(currentLogStartDateLocalTime[2])
-            currentLogEndDate.setMonth(currentLogStartDateLocalTime[0])
-            currentLogEndDate.setDate(currentLogStartDateLocalTime[1])
-            currentLogEndDate.setHours(23)
-            currentLogEndDate.setMinutes(59)
-            currentLogEndDate.setSeconds(0)
-            currentLogEndDate.setMilliseconds(0)
-
-            // console.log('new cled case 1', currentLogEndDate)
-          }
-          else if (currentLogStartDateLocalTime[1] < selectedDay[1])
-          {
-            // sets to beginning of the day
-
-            // console.log('old clsd', currentLogStartDate)
-
-            // console.log('old clsdlt pre convert', currentLogStartDateLocalTime)
-            currentLogStartDateLocalTime[0] = currentLogEndDateLocalTime[0];
-            currentLogStartDateLocalTime[1] = currentLogEndDateLocalTime[1];
-            currentLogStartDateLocalTime[2] = currentLogEndDateLocalTime[2];
-            // console.log('old clsdlt post convert', currentLogStartDateLocalTime)
-
-            currentLogStartDate.setFullYear(currentLogStartDateLocalTime[2])
-
-            // january is 0
-            currentLogStartDate.setMonth(currentLogStartDateLocalTime[0] - 1)
-            currentLogStartDate.setDate(currentLogStartDateLocalTime[1])
-            currentLogStartDate.setHours(0)
-            currentLogStartDate.setMinutes(0)
-            currentLogStartDate.setSeconds(0)
-            currentLogStartDate.setMilliseconds(0)
-
-            // console.log('new clsd', currentLogStartDate)
-          }
-          
-        }
-        // else if (currentLogStartDateLocalTime[1] != currentLogEndDateLocalTime[1])
-        // {
-        //   localDay = endDateLocalDay;
-        //   localHours = '00'
-        //   localMinutes = '00'
-        // }
-      }
-
-      if (currentLogStartDateLocalTime[0] == selectedDay[0]
-          && currentLogStartDateLocalTime[1] == selectedDay[1]
-          && currentLogStartDateLocalTime[2] == selectedDay[2])
-      {
-        // console.log('this date is converted because it is ' + currentLogStartDateLocalTime
-        // + 'and the selected day is ' + selectedDay)
-
-        var obj = data['logs'][log];
-        // console.log('hehednio', data['logs'][log])
-        var trueUTCStartDate = data['logs'][log]['startDate']
-
-        // CONVERT TO LOCAL TIME
-        
-
-        // console.log('currentstartdateUTC ' + currentLogStartDate.toUTCString())
-        // console.log('currentenddateUTC ' + currentLogEndDate.toUTCString())
-        // console.log('currentstartdateLocal ' + new Date(currentLogStartDate.toUTCString()).toLocaleString())
-        // console.log('currentenddateLocal ' + new Date(currentLogEndDate.toUTCString()).toLocaleString())
-
-        var localeDate = currentLogStartDate.toLocaleString();
-        // console.log(localeDate)
-        var localHours = localeDate.substring(localeDate.indexOf(',') + 2, localeDate.indexOf(':'))
-        if (localeDate.includes('AM') && localHours == '12')
-        {
-          localHours = '0'
-        }
-        if (localeDate.includes('PM') && localHours != '12')
-        {
-          // console.log(typeof(localHours) + ' ' + localHours)
-          // console.log(localeDate)
-          localHours = ((localHours * 1) + 12) + ''
-          // console.log(localHours)
-        }
-        // console.log('localeDate', localeDate)
-        // console.log(localeDate.includes('PM'))
-        // console.log(localHours)
-
-        var localMinutes = localeDate.substring(localeDate.indexOf(':') + 1)
-        localMinutes = localMinutes.substring(0, localMinutes.indexOf(':'))
-
-        var localDay = localeDate.substring(localeDate.indexOf('/') + 1)
-        localDay = localDay.substring(0, localDay.indexOf('/'))
-        var localMonth = localeDate.substring(0, localeDate.indexOf('/'))
-
-        var localYear = localeDate.substring(localeDate.indexOf('/') + 1)
-        // console.log(localYear)
-        localYear = localYear.substring(localYear.indexOf('/') + 1)
-        // console.log(localYear)
-        localYear = localYear.substring(0,4)
-        // console.log (localMinutes + ' -- ' + localDay + ' -- ' + localMonth + ' -- ' + localYear)
-
-
-        var localeEndDate = currentLogEndDate.toLocaleString();
-
-        var endDateLocalHours = localeEndDate.substring(localeEndDate.indexOf(',') + 2, localeEndDate.indexOf(':'))
-        if (localeEndDate.includes('AM') && endDateLocalHours == '12')
-        {
-          endDateLocalHours = '0'
-        }
-        if (localeEndDate.includes('PM') && endDateLocalHours != '12')
-        {
-          // console.log(typeof(endDateLocalHours) + ' ' + endDateLocalHours)
-          // console.log(localeEndDate)
-          endDateLocalHours = ((endDateLocalHours * 1) + 12) + ''
-          // console.log(endDateLocalHours)
-        }
-
-
-        var endDateLocalMinutes = localeEndDate.substring(localeEndDate.indexOf(':') + 1)
-        endDateLocalMinutes = endDateLocalMinutes.substring(0, endDateLocalMinutes.indexOf(':'))
-
-        var endDateLocalDay = localeEndDate.substring(localeEndDate.indexOf('/') + 1)
-        endDateLocalDay = endDateLocalDay.substring(0, endDateLocalDay.indexOf('/'))
-        var endDateLocalMonth = localeEndDate.substring(0, localeEndDate.indexOf('/'))
-
-        var endDateLocalYear = localeEndDate.substring(localeEndDate.indexOf('/') + 1)
-        endDateLocalYear = endDateLocalYear.substring(endDateLocalYear.indexOf('/') + 1)
-        endDateLocalYear = endDateLocalYear.substring(0,4)
-
-        if (localHours.length == 1)
-        {
-          localHours = '0' + localHours;
-        }
-        if (localDay.length == 1)
-        {
-          localDay = '0' + localDay;
-        }
-        if (localMonth.length == 1)
-        {
-          localMonth = '0' + localMonth;
-        }
-
-        if (endDateLocalHours.length == 1)
-        {
-          endDateLocalHours = '0' + endDateLocalHours;
-        }
-        if (endDateLocalDay.length == 1)
-        {
-          endDateLocalDay = '0' + endDateLocalDay;
-        }
-        if (endDateLocalMonth.length == 1)
-        {
-          endDateLocalMonth = '0' + endDateLocalMonth;
-        }
-
-
-        // // Sends just the part of the event that occurs during that day
-        // if (localDay != endDateLocalDay)
-        // {
-        //   // includes case for if its Day X - Day Y @ midnight
-        //   if ((endDateLocalDay * 1) > (selectedDay[0] * 1))
-        //   {
-        //     endDateLocalDay = localDay;
-        //     endDateLocalHours = '23'
-        //     endDateLocalMinutes = '59'
-        //   }
-        //   else if ((localDay * 1) < (selectedDay[0] * 1))
-        //   {
-        //     localDay = endDateLocalDay;
-        //     localHours = '00'
-        //     localMinutes = '00'
-        //   }
-        // }
-        
-
-        obj['startDate'] = localYear + '-' + localMonth + '-' + localDay + 'T' + localHours + ':' + localMinutes + ':00.000Z'
-        obj['endDate'] = endDateLocalYear + '-' + endDateLocalMonth + '-' + endDateLocalDay + 'T' + endDateLocalHours + ':' + endDateLocalMinutes + ':00.000Z'
-        
-        // THIS IS NOT REFLECTED IN THE FIREBASE, IT'S JUST A WAY TO MAINTAIN THE LOG PATH AND START DATE
-        obj['logID'] = log
-        obj['trueUTCStartDate'] = trueUTCStartDate;
-
-        // console.log(data['logs'][log])
-        // console.log(obj['startDate'])
-        // console.log(obj['endDate'])
-        // console.log('--------------- :) ============')
-
-
-        result = [...result, obj]
-        // console.log("MATCH!!!")
-      }
-
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    // console.log(JSON.stringify(result) + ' *** RESULT\n\n')
+    // sleep(2000).then(() => { 
+    //   console.log("World!"); 
+      
+      // console.log('dv1' + dateViewing)
 
-    result.sort(function(a, b) {
-      var keyA = new Date(a.startDate),
-        keyB = new Date(b.startDate);
-      // Compare the 2 dates
-      if (keyA < keyB) return -1;
-      if (keyA > keyB) return 1;
-      return 0;
-    });
+
+      // setDateViewing(new Date().toISOString())
+      // console.log(dateViewing + ' *** DATE VIEWING')
+      const data = getData()
+      // console.log(data['logs'][0] + ' *** GET DATA')
+      var result = []
+      
+      // console.log('dvdata ', JSON.stringify(data))
+      for (var log in data['logs']) 
+      {
+        // console.log('test')
+        console.log(new Date().toISOString())
+        console.log('parseiso SD ', JSON.stringify(data['logs'][log]['startDate']))
+        console.log('parseiso ED ', JSON.stringify(data['logs'][log]['endDate']))
+
+
+        var currentLogStartDate = parseISOString(data['logs'][log]['startDate'])
+        var currentLogEndDate = parseISOString(data['logs'][log]['endDate'])
+        // console.log(currentLogStartDate)
+        // var currentLogStartDateLocalTime = parseISOString(currentLogStartDate.toLocaleTimeString())
+        // console.log('now LOCAL time: ' + currentLogStartDate.toLocaleDateString())
+
+        var currentLogStartDateLocalTime = [currentLogStartDate.toLocaleDateString()[0], currentLogStartDate.toLocaleDateString().substring(2,4), currentLogStartDate.toLocaleDateString().substring(5)]
+        var currentLogEndDateLocalTime = [currentLogEndDate.toLocaleDateString()[0], currentLogEndDate.toLocaleDateString().substring(2,4), currentLogEndDate.toLocaleDateString().substring(5)]
+        // console.log('log day' + currentLogStartDateLocalTime + ' ' + currentLogEndDateLocalTime)
+        // console.log('log day specific' + currentLogStartDate + ' ' + currentLogEndDate)
+
+        // console.log('dv ' + dateViewing)
+        // var selectedDayString = parseISOString(dateViewing)
+        // console.log('dv2 ' + selectedDayString)
+        // console.log('=============== ' + dateViewing + ' ==================')
+
+        // TODO: refactor to make scalable for months that are one or two digits
+        // var selectedDay = [dateViewing.toLocaleDateString()[0], dateViewing.toLocaleDateString().substring(2,4), dateViewing.toLocaleDateString().substring(5)]
+        var selectedDay = [dateViewing[0], dateViewing[1], dateViewing[2]]
+
+        // console.log('selected day' + selectedDay)
+        // console.log('dateviewing arr:' + dateViewing)
+        // console.log('selected day' + new Date ().setMonth(1).getMonth())
+
+
+        // Sends just the part of the event that occurs during that day
+        // TODO: refactor to cover months/years
+
+        // returns a string of the greater date or equal
+        // format: [DD, MM, YYYY]
+        function compareDates (d1, d2) {
+          // same year
+          if(d1[2] == d2[2])
+          {
+            // same month
+            if(d1[0] == d2[0])
+            {
+              // same day
+              if(d1[1] == d2[1])
+              {
+                return "equal"
+              }
+              
+              // same month diff days
+              return d2[1] > d1[1] ? "d2" : "d1"
+            }
+
+            // same year diff months
+            return d2[0] > d1[0] ? "d2" : "d1"
+          }
+
+          // diff years
+          return d2[2] > d1[2] ? "d2" : "d1"
+        }
+
+        // handles logs that span mulitple dates
+        if (compareDates(currentLogStartDateLocalTime, currentLogEndDateLocalTime) != 'equal')
+        {
+          // includes case for if its Day X - Day Y @ midnight
+          // implies that enddate is greater chronologically than start date but may be new month
+          if (currentLogStartDateLocalTime[1] != currentLogEndDateLocalTime[1])
+          {
+            // console.log('true! ' + currentLogStartDateLocalTime[1] + ' ' + currentLogEndDateLocalTime[1])
+            if (currentLogEndDateLocalTime[1] > selectedDay[1])
+            {
+              // console.log('old cled case 1', currentLogEndDate)
+
+              // sets to end of the day
+              currentLogEndDateLocalTime[0] = currentLogStartDateLocalTime[0];
+              currentLogEndDateLocalTime[1] = currentLogStartDateLocalTime[1];
+              currentLogEndDateLocalTime[2] = currentLogStartDateLocalTime[2];
+
+              currentLogEndDate.setFullYear(currentLogStartDateLocalTime[2])
+              currentLogEndDate.setMonth(currentLogStartDateLocalTime[0])
+              currentLogEndDate.setDate(currentLogStartDateLocalTime[1])
+              currentLogEndDate.setHours(23)
+              currentLogEndDate.setMinutes(59)
+              currentLogEndDate.setSeconds(0)
+              currentLogEndDate.setMilliseconds(0)
+
+              // console.log('new cled case 1', currentLogEndDate)
+            }
+            else if (currentLogStartDateLocalTime[1] < selectedDay[1])
+            {
+              // sets to beginning of the day
+
+              // console.log('old clsd', currentLogStartDate)
+
+              // console.log('old clsdlt pre convert', currentLogStartDateLocalTime)
+              currentLogStartDateLocalTime[0] = currentLogEndDateLocalTime[0];
+              currentLogStartDateLocalTime[1] = currentLogEndDateLocalTime[1];
+              currentLogStartDateLocalTime[2] = currentLogEndDateLocalTime[2];
+              // console.log('old clsdlt post convert', currentLogStartDateLocalTime)
+
+              currentLogStartDate.setFullYear(currentLogStartDateLocalTime[2])
+
+              // january is 0
+              currentLogStartDate.setMonth(currentLogStartDateLocalTime[0] - 1)
+              currentLogStartDate.setDate(currentLogStartDateLocalTime[1])
+              currentLogStartDate.setHours(0)
+              currentLogStartDate.setMinutes(0)
+              currentLogStartDate.setSeconds(0)
+              currentLogStartDate.setMilliseconds(0)
+
+              // console.log('new clsd', currentLogStartDate)
+            }
+            
+          }
+          // else if (currentLogStartDateLocalTime[1] != currentLogEndDateLocalTime[1])
+          // {
+          //   localDay = endDateLocalDay;
+          //   localHours = '00'
+          //   localMinutes = '00'
+          // }
+        }
+
+        if (currentLogStartDateLocalTime[0] == selectedDay[0]
+            && currentLogStartDateLocalTime[1] == selectedDay[1]
+            && currentLogStartDateLocalTime[2] == selectedDay[2])
+        {
+          // console.log('this date is converted because it is ' + currentLogStartDateLocalTime
+          // + 'and the selected day is ' + selectedDay)
+
+          var obj = data['logs'][log];
+          // console.log('hehednio', data['logs'][log])
+          var trueUTCStartDate = data['logs'][log]['startDate']
+
+          // CONVERT TO LOCAL TIME
+          
+
+          // console.log('currentstartdateUTC ' + currentLogStartDate.toUTCString())
+          // console.log('currentenddateUTC ' + currentLogEndDate.toUTCString())
+          // console.log('currentstartdateLocal ' + new Date(currentLogStartDate.toUTCString()).toLocaleString())
+          // console.log('currentenddateLocal ' + new Date(currentLogEndDate.toUTCString()).toLocaleString())
+
+          var localeDate = currentLogStartDate.toLocaleString();
+          // console.log(localeDate)
+          var localHours = localeDate.substring(localeDate.indexOf(',') + 2, localeDate.indexOf(':'))
+          if (localeDate.includes('AM') && localHours == '12')
+          {
+            localHours = '0'
+          }
+          if (localeDate.includes('PM') && localHours != '12')
+          {
+            // console.log(typeof(localHours) + ' ' + localHours)
+            // console.log(localeDate)
+            localHours = ((localHours * 1) + 12) + ''
+            // console.log(localHours)
+          }
+          // console.log('localeDate', localeDate)
+          // console.log(localeDate.includes('PM'))
+          // console.log(localHours)
+
+          var localMinutes = localeDate.substring(localeDate.indexOf(':') + 1)
+          localMinutes = localMinutes.substring(0, localMinutes.indexOf(':'))
+
+          var localDay = localeDate.substring(localeDate.indexOf('/') + 1)
+          localDay = localDay.substring(0, localDay.indexOf('/'))
+          var localMonth = localeDate.substring(0, localeDate.indexOf('/'))
+
+          var localYear = localeDate.substring(localeDate.indexOf('/') + 1)
+          // console.log(localYear)
+          localYear = localYear.substring(localYear.indexOf('/') + 1)
+          // console.log(localYear)
+          localYear = localYear.substring(0,4)
+          // console.log (localMinutes + ' -- ' + localDay + ' -- ' + localMonth + ' -- ' + localYear)
+
+
+          var localeEndDate = currentLogEndDate.toLocaleString();
+
+          var endDateLocalHours = localeEndDate.substring(localeEndDate.indexOf(',') + 2, localeEndDate.indexOf(':'))
+          if (localeEndDate.includes('AM') && endDateLocalHours == '12')
+          {
+            endDateLocalHours = '0'
+          }
+          if (localeEndDate.includes('PM') && endDateLocalHours != '12')
+          {
+            // console.log(typeof(endDateLocalHours) + ' ' + endDateLocalHours)
+            // console.log(localeEndDate)
+            endDateLocalHours = ((endDateLocalHours * 1) + 12) + ''
+            // console.log(endDateLocalHours)
+          }
+
+
+          var endDateLocalMinutes = localeEndDate.substring(localeEndDate.indexOf(':') + 1)
+          endDateLocalMinutes = endDateLocalMinutes.substring(0, endDateLocalMinutes.indexOf(':'))
+
+          var endDateLocalDay = localeEndDate.substring(localeEndDate.indexOf('/') + 1)
+          endDateLocalDay = endDateLocalDay.substring(0, endDateLocalDay.indexOf('/'))
+          var endDateLocalMonth = localeEndDate.substring(0, localeEndDate.indexOf('/'))
+
+          var endDateLocalYear = localeEndDate.substring(localeEndDate.indexOf('/') + 1)
+          endDateLocalYear = endDateLocalYear.substring(endDateLocalYear.indexOf('/') + 1)
+          endDateLocalYear = endDateLocalYear.substring(0,4)
+
+          if (localHours.length == 1)
+          {
+            localHours = '0' + localHours;
+          }
+          if (localDay.length == 1)
+          {
+            localDay = '0' + localDay;
+          }
+          if (localMonth.length == 1)
+          {
+            localMonth = '0' + localMonth;
+          }
+
+          if (endDateLocalHours.length == 1)
+          {
+            endDateLocalHours = '0' + endDateLocalHours;
+          }
+          if (endDateLocalDay.length == 1)
+          {
+            endDateLocalDay = '0' + endDateLocalDay;
+          }
+          if (endDateLocalMonth.length == 1)
+          {
+            endDateLocalMonth = '0' + endDateLocalMonth;
+          }
+
+
+          // // Sends just the part of the event that occurs during that day
+          // if (localDay != endDateLocalDay)
+          // {
+          //   // includes case for if its Day X - Day Y @ midnight
+          //   if ((endDateLocalDay * 1) > (selectedDay[0] * 1))
+          //   {
+          //     endDateLocalDay = localDay;
+          //     endDateLocalHours = '23'
+          //     endDateLocalMinutes = '59'
+          //   }
+          //   else if ((localDay * 1) < (selectedDay[0] * 1))
+          //   {
+          //     localDay = endDateLocalDay;
+          //     localHours = '00'
+          //     localMinutes = '00'
+          //   }
+          // }
+          
+
+          obj['startDate'] = localYear + '-' + localMonth + '-' + localDay + 'T' + localHours + ':' + localMinutes + ':00.000Z'
+          obj['endDate'] = endDateLocalYear + '-' + endDateLocalMonth + '-' + endDateLocalDay + 'T' + endDateLocalHours + ':' + endDateLocalMinutes + ':00.000Z'
+          
+          // THIS IS NOT REFLECTED IN THE FIREBASE, IT'S JUST A WAY TO MAINTAIN THE LOG PATH AND START DATE
+          obj['logID'] = log
+          obj['trueUTCStartDate'] = trueUTCStartDate;
+
+          // console.log(data['logs'][log])
+          // console.log(obj['startDate'])
+          // console.log(obj['endDate'])
+          // console.log('--------------- :) ============')
+
+
+          result = [...result, obj]
+          // console.log("MATCH!!!")
+        }
+
+      }
+
+      // console.log(JSON.stringify(result) + ' *** RESULT\n\n')
+
+      result.sort(function(a, b) {
+        var keyA = new Date(a.startDate),
+          keyB = new Date(b.startDate);
+        // Compare the 2 dates
+        if (keyA < keyB) return -1;
+        if (keyA > keyB) return 1;
+        return 0;
+      });
+      
+      return result;
     
-    return result;
+    
+    
+    // }); //FROM SLEEP
+
   }
 
   const getDates = () => {

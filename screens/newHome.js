@@ -7,8 +7,20 @@ import { getDatabase, ref, set, update, onValue } from "firebase/database";
 import categoryData from '../data/categoryData';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
+// function sleep(milliseconds) {
+//   const date = Date.now();
+//   let currentDate = null;r
+//   do {
+//     currentDate = Date.now();
+//   } while (currentDate - date < milliseconds);
+// }
+
+// sleep(10000)s
 
 const screenWidth = Dimensions.get("window").width;
+
+console.log('hidso')
+console.log(auth.currentUser.uid)
 
 
 
@@ -88,12 +100,14 @@ const NewHome = ({navigation}) => {
 ];
 
 const updates = {};
-updates['/users/1/goals'] = goalsDB;
+updates['/users/' + auth.currentUser.uid + '/goals'] = goalsDB;
   
   useEffect(() => {
-    // writeUserData('1', 'Robert', 'Wachen', 'robert@wachenmail.com', 'password', logsDB, goalsDB)
+    // writeUserData(auth.currentUser.uid, 'Robert', 'Wachen', 'robert@wachenmail.com', 'password', logsDB, goalsDB)
     // update(ref(db), updates);
-    onValue(ref(db, 'users/1/'), (snapshot) => {
+    // console.log('asdmi0')
+    // console.log(auth.currentUser.uid)
+    onValue(ref(db, 'users/' + auth.currentUser.uid + '/'), (snapshot) => {
       setData(snapshot.val());
       });
     console.log('Done! :D')

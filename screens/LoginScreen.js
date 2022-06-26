@@ -2,10 +2,11 @@ import { useNavigation } from '@react-navigation/native'
 import React, { useEffect, useState } from 'react'
 import { KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { auth, firebase } from '../config';
+import { getDatabase, ref, set, update, onValue } from "firebase/database";
 
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 
-
+const db = getDatabase();
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('')
@@ -29,6 +30,10 @@ const LoginScreen = () => {
       .then(userCredentials => {
         const user = userCredentials.user;
         console.log('Registered with:', user.email);
+
+        set(ref(db, 'users/' + user.uid), {
+          email: user.email,
+        });
       })
       .catch(error => alert(error.message))
   }

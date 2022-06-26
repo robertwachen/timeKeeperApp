@@ -2,7 +2,7 @@ import { useState, Pressable } from 'react';
 import { AppRegistry, FlatList, StyleSheet, Text, View, Image } from 'react-native';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import categoryData from '../data/categoryData';
-import { firebase } from '../config';
+import { firebase, auth } from '../config';
 import { getDatabase, ref, set, update, onValue, push, remove } from "firebase/database";
 
 TouchableOpacity.defaultProps = {...(TouchableOpacity.defaultProps || {}), delayPressIn: 0};
@@ -12,7 +12,7 @@ function roundbyFifteen (number) {
     console.log(number)
     if (number == 0)
     {
-        return 0
+        return '00'
     }
     else if (number < 15) 
     {
@@ -57,6 +57,8 @@ const SubCategory = (props) => {
 
         var endDateFromFirebase = ''
 
+        var noDateFound = true;
+
 
         for (var log in data) {
             var obj = data[log];
@@ -97,9 +99,11 @@ const SubCategory = (props) => {
             // figure out how to do the comparison
             console.log(obj['startDate'], props.bubbleSelected)
 
-            if (obj['startDate'] == props.bubbleSelected || obj['startDate'] == currentDateState) 
+            if (obj['startDate'] == props.bubbleSelected || 
+                obj['startDate'] == currentDateState) 
             {
                 console.log('Match!')
+                noDateFound = false;
                 oldLog = data[log]
                 oldLogID = data[log]['logID']
 
@@ -126,14 +130,30 @@ const SubCategory = (props) => {
                     subCategory: props.item,
                 };
 
-                var logPath ='/users/1/logs/'
+                var logPath ='/users/' + auth.currentUser.uid + '/logs/'
                 logPath += oldLogID
 
                 updates[logPath] = newUpdate;
+                
+                console.log('subcat update bef', new Date().toISOString())
                 update(ref(db), updates);
+                console.log('subcat update aft', new Date().toISOString())
 
+                // fixes db timing issues       
+                // const updateSynchronously = async () => {
+                //     const updatesPushed = await update(ref(db), updates);
+                // }
+
+                // updateSynchronously()
             }
         }
+
+        // this means it's a new entry and the DB hasn't updated yet
+        if (noDateFound)
+        {
+            // await/promise stuff
+        }
+        
         console.log('done\n\n')
     }
 
@@ -217,7 +237,7 @@ const Item = (props) => {
         var d1, d2;
 
         var data = {}
-        onValue(ref(db, 'users/1/'), (snapshot) => {
+        onValue(ref(db, 'users/' + auth.currentUser.uid + '/'), (snapshot) => {
             data = snapshot.val();
         });
 
@@ -254,11 +274,24 @@ const Item = (props) => {
         }
         
 
-        // console.log("*****************DASDSJA*()")
+        console.log("*****************DASDSJA*()")
         // console.log(logData())
 
         var logs = logData();
         // console.log(logs[0]['endDate'])
+        if (true)
+        {
+
+            // THIS NEEDS TO BE DYNAMIC
+            logs = [{
+                category: 'Body',
+                startDate: '2022-06-15T00:00:00.000Z',
+                endDate: '2022-06-26T02:00:00.000Z',
+                subCategory: 'Uncategorized'
+            }]
+        }
+        console.log('logs', JSON.stringify(logs))
+
         var result = logs[0]['endDate']
         // console.log(result)
         // console.log('----------------')
@@ -465,7 +498,7 @@ const Item = (props) => {
             var oldLogNewEndDate = getSelectCategoryStartDate();
             console.log('oldLogNewEndDate', oldLogNewEndDate)
 
-            var logPath ='/users/1/logs/'
+            var logPath ='/users/' + auth.currentUser.uid + '/logs/'
             logPath += oldLogID
             console.log('logPath', logPath)
 
@@ -540,7 +573,7 @@ const Item = (props) => {
                 props.setBubbleSelected(null)
             }
             
-            addLog('1',updateLog()) // DB PUSH
+            addLog(auth.currentUser.uid, updateLog()) // DB PUSH
         }
 
         // adding a new log
@@ -551,7 +584,7 @@ const Item = (props) => {
 
             // get this logs data
             props.setBubbleSelected(newLog()['startDate'])
-            addLog('1',newLog()) // DB PUSH
+            addLog(auth.currentUser.uid,newLog()) // DB PUSH
 
             // animation off/on
             // setTimeout(function () {

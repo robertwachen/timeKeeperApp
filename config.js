@@ -20,5 +20,14 @@ const firebaseConfig = {
 // Initialize Firebase
 const firebase = initializeApp(firebaseConfig);
 const auth = getAuth(firebase)
+// function sleep(ms) {
+//   var start = new Date().getTime(), expire = start + ms;
+//   while (new Date().getTime() < expire) { }
+//   return;
+// }
+
+// console.log('going to');
+// sleep(5000)
+// console.log('sleep');
 
 export { firebase, auth };

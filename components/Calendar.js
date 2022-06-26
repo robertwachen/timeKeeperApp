@@ -211,6 +211,11 @@ const Event = (props) => {
         // console.log(evt)
     };
 
+    const getName = (name) => {
+        console.log(name)
+        return (name == 'Uncategorized') ?  props.item['category'] : props.item['subCategory']
+    }
+
     return (
         // customize backgroundColor, height, top
         <View style={{zIndex:5}}
@@ -226,14 +231,14 @@ const Event = (props) => {
                 {
                     (props.bubbleSelected == props.item['startDate']) ?
                     <View style={[styles.calendarOverrideEventBubble, {top: props.tapLocationY, height: bubbleHeight-props.tapLocationY, position: 'absolute'}]}>
-                        <Text style={{fontSize:12, fontWeight:"bold", color: "#3B4043"}}>
-                            Select Category
+                        <Text style={{fontSize: 12, fontWeight:"bold", color: "#3B4043"}}>
+                            Edit
                         </Text>
                     </View>
                     :
                     null
                 }
-                <Text style={{fontSize:14, fontWeight:"bold", color: "#fff"}}>{props.item['category']}</Text>
+                <Text style={{fontSize:14, fontWeight:"bold", color: "#fff"}}>{getName(props.item['subCategory'])}</Text>
                 </View>
             </TouchableOpacity>
         </View>
@@ -248,10 +253,15 @@ const Calendar = (props) => {
 
         const todayDate = new Date()
 
+        // console.log(todayDate.getHours(), todayDate.getMinutes())
+
         var result = ((todayDate.getHours() * 60) + (todayDate.getMinutes())) / 15 * 36;
 
         // size of the view
         result += 27
+
+        // removed the 36 pixels above the 12 AM starting point
+        result -= 36
 
         // console.log(todayDate.getHours() + ': current time height')
         // console.log(todayDate.getMinutes() + ': current time height')
